@@ -37,5 +37,6 @@
         background-color: #333;
         color: white;
         height: 100vh;
+        width: 200px;
     }
 </style>

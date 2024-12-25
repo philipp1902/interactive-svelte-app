@@ -4,6 +4,7 @@
     import History from "./components/History.svelte";
   
     let inputText = "";
+    let inputTextAnimal = "";
     let responseText = "";
     let animalImage = "";
     let animalLink = "";
@@ -22,6 +23,7 @@
       try {
         lastAnimal.set(responseText);
         lastName.set(historyName);
+        // const prompt = `Find the name of an animal that sounds most similar to a given name and answer with nothing but the name of that animal. E.g. for the input "Leo", answer with "Lion". Start with the name "${inputText}".`;
         const prompt = `Find the name of an animal that sounds most similar to a given name and answer with nothing but the name of that animal. E.g. for the input "Leo", answer with "Lion". Start with the name "${inputText}".`;
   
         const response = await openai.chat.completions.create({
@@ -47,15 +49,17 @@
   
         if (includeImage) {
           // Generate an image using DALL-E
-          const imagePrompt = `Create a small, realistic cartoon version of a ${responseText}.`;
+          const imagePrompt = `Create a realistic ${responseText} mixed with ${inputTextAnimal}.`;
           const imageResponse = await openai.images.generate({
             prompt: imagePrompt,
             n: 1,
-            size: "256x256",
+            size: "512x512",
           });
   
           animalImage = imageResponse.data[0].url;
         }
+
+        
       } catch (error) {
         console.error(
           "Error while retrieving the parental animals, Wikipedia link, or generating the image:",
@@ -67,6 +71,7 @@
   
   <div>
     <input type="text" placeholder="Enter a name" bind:value={inputText} />
+    <input type="text" placeholder="Enter a animal to mix with" bind:value={inputTextAnimal} />
     <button on:click={runPrompt}>Get Spirit Animal</button>
     <label>
       <input type="checkbox" bind:checked={includeImage} />
