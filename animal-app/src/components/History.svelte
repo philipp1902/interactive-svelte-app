@@ -34,9 +34,9 @@
         top: 0;
         right: 0;
         padding: 1em;
-        background-color: #333;
+        background-color: #30303065;
         color: white;
-        height: 100vh;
+        height: 256px;
         width: 200px;
     }
 </style>
