@@ -93,3 +93,36 @@ button:hover {
   .card[style*="background-color: blau"] {
     background-color: blue;
   }
+/* 
+  .card:hover[style*="background-color: rot"] {
+    background-color: red;
+  }
+  .card[style*="background-color: gelb"] {
+    background-color: yellow;
+  }
+  .card[style*="background-color: grün"] {
+    background-color: green;
+  }
+  .card[style*="background-color: blau"] {
+    background-color: blue;
+  } */
+
+  .tooltip {
+    position: absolute;
+    top: 40%;
+    left: 90%;
+    transform: translate(-50%, -50%);
+    background-color: #e3bbff;
+    padding: 10px;
+    border-radius: 5px;
+    text-align: center;
+    font-size: 16px;
+    z-index: 1000;
+  }
+
+  h3 {      /*für tooltip */
+    font-size: 1.2rem;
+    margin-bottom: 0px;
+    color: #1e0233;
+    text-align: left;
+  }

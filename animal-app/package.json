@@ -14,7 +14,9 @@
     "vite": "^6.0.1"
   },
   "dependencies": {
+    "@sveltejs/kit": "^2.15.1",
     "dotenv": "^16.4.7",
-    "openai": "^4.76.0"
+    "openai": "^4.76.0",
+    "svelte-spa-router": "^4.0.1"
   }
 }
