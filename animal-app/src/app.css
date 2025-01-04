@@ -44,7 +44,7 @@ h1 {
 p {
     font-size: 1.2rem;
     margin-bottom: 20px;
-    color: #dcdcdc;
+    color: #1e0233;
 }
 
 /* Button styling */
@@ -65,7 +65,12 @@ button:hover {
 }
 
 
-
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+  gap: 10px;
+  justify-content: center;
+}
 .card {
     display: inline-block;
     margin: 10px;
@@ -126,3 +131,34 @@ button:hover {
     color: #1e0233;
     text-align: left;
   }
+
+  a {
+    font-size: 1.2rem;
+    margin-bottom: 20px;
+    color: #dcdcdc;
+    
+  }
+
+
+  @media (max-width: 600px) {
+    header nav ul {
+        flex-direction: column;
+    }
+
+    header nav ul li {
+        margin: 5px 0;
+    }
+}
+
+@media (max-width: 600px) {
+  .card-grid {
+      grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+  }
+
+  .card {
+      width: 60px;
+      height: 90px;
+      font-size: 18px;
+      line-height: 90px;
+  }
+}

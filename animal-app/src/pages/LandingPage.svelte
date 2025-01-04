@@ -13,7 +13,7 @@
 </script>
 
 <main>
-  <h1>Willkommen zu Mau Mau</h1>
+  <h1>Willkommen zu Miau Miau</h1>
   <p>Klicke auf den Button, um das Spiel zu starten.</p>
   <button on:click={navigateToGame}>Spiel starten</button>
 </main>

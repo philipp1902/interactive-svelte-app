@@ -40,7 +40,7 @@ Your task is to play the game according to these rules. You will be given the to
 For example, if the top card of the discard pile is a red 5, you can play any red card or any 5 from your hand. If you don't have a matching card, you need to draw a card.
 
 Here is the current state of the game:
-- Top card of the discard pile: "${lastCard.color} ${lastCard.number}"
+- Top card of the discard pile: ${lastCard.color} ${lastCard.number}
 - Your hand: ${aiCards.map(card => `${card.color} ${card.number}`).join(', ')}
 
 Which card will you play? If you need to draw a card, just say "draw".
@@ -57,16 +57,16 @@ Which card will you play? If you need to draw a card, just say "draw".
       if (aiResponse.toLowerCase().includes("draw")) {
         drawCardForAI();
       } else {
-        const aiCard = aiCards.find(card => aiResponse.includes(`${card.color} ${card.number}`));
-        if (aiCard && (aiCard.color === lastCard.color || aiCard.number === lastCard.number)) {
-          aiCards = aiCards.filter(card => card !== aiCard);
-          discardPile.push(aiCard);
-          lastCard = aiCard;
-          canDraw = true; // Erlaubt dem Spieler wieder zu ziehen
+        const aiCard = aiCards.find(card => aiResponse.includes(`${card.color} ${card.number}`));     // hier werden die Karten der KI mit den Karten verglichen, die sie spielen kann
+        if (aiCard && (aiCard.color === lastCard.color || aiCard.number === lastCard.number)) {       // wenn die Karte der KI passt, wird sie gespielt
+          aiCards = aiCards.filter(card => card !== aiCard);                                // die Karte wird aus der Hand der KI entfernt
+          discardPile.push(aiCard);                                                // die Karte wird auf den Ablagestapel gelegt
+          lastCard = aiCard;                                            // die Karte wird zur letzten Karte
+          canDraw = true;       
           message = "";
           console.log("AI played:", aiCard);
         } else {
-          console.log("AI tried to play an invalid card, drawing instead.");
+          console.log("AI tried to play an invalid card, drawing instead.");        // wenn die Karte nicht passt, wird eine Karte gezogen
           drawCardForAI();
         }
       }
@@ -101,7 +101,7 @@ Which card will you play? If you need to draw a card, just say "draw".
     deck = shuffleDeck(createDeck());
     playerCards = deck.slice(0, 7);
     aiCards = deck.slice(7, 14);
-    discardPile = [deck[14]]; // Die erste Karte des Ablagestapels
+    discardPile = [deck[14]]; // erste karte im ablagestapel zum start
     lastCard = discardPile[0];
     canDraw = true;
     gameOver = false;
@@ -112,10 +112,9 @@ Which card will you play? If you need to draw a card, just say "draw".
     if (canDraw && deck.length > 0) {
       const drawnCard = deck.pop();
       playerCards = [...playerCards, drawnCard];
-      canDraw = false; // Nur einmal ziehen erlaubt
+      canDraw = false;
       message = "Du kannst nur einmal pro Runde ziehen.";
     } else if (deck.length === 0) {
-      // Wenn der Stapel leer ist, den Ablagestapel mischen und als neuen Stapel verwenden
       deck = shuffleDeck(discardPile.slice(0, -1));
       discardPile = [discardPile[discardPile.length - 1]];
       const drawnCard = deck.pop();
@@ -134,7 +133,7 @@ Which card will you play? If you need to draw a card, just say "draw".
       aiCards = [...aiCards, drawnCard];
       console.log("AI drew a card:", drawnCard);
     } else {
-      // Wenn der Stapel leer ist, den Ablagestapel mischen und als neuen Stapel verwenden
+      // wenn stapel leer, ablagestapel mischen und als neuen stapel verwenden
       deck = shuffleDeck(discardPile.slice(0, -1));
       discardPile = [discardPile[discardPile.length - 1]];
       const drawnCard = deck.pop();
@@ -149,7 +148,7 @@ Which card will you play? If you need to draw a card, just say "draw".
       playerCards = playerCards.filter(c => c !== card);
       discardPile.push(card);
       lastCard = card;
-      canDraw = true; // Erlaubt dem Spieler wieder zu ziehen
+      canDraw = true;
       message = "";
     } else {
       message = "Du kannst diese Karte nicht spielen.";
@@ -176,8 +175,9 @@ Which card will you play? If you need to draw a card, just say "draw".
   });
 </script>
 
+
 <main>
-  <h1>Mau Mau</h1>
+  <h1>Miau Miau</h1>
   <div>
     <h2>Deine Karten:</h2>
     <ul>
@@ -188,21 +188,6 @@ Which card will you play? If you need to draw a card, just say "draw".
           on:mouseover={() => hoveredCard = card}
           on:mouseout={() => hoveredCard = null}
           on:click={() => playCard(card)}
-        >
-          {card.number}
-        </li>
-      {/each}
-    </ul>
-  </div>
-  <div>
-    <h2>KI Karten:</h2>
-    <ul>
-      {#each aiCards as card}
-        <li
-          class="card"
-          style="background-color: {card.color};"
-          on:mouseover={() => hoveredCard = card}
-          on:mouseout={() => hoveredCard = null}
         >
           {card.number}
         </li>
@@ -228,6 +213,21 @@ Which card will you play? If you need to draw a card, just say "draw".
     <button on:click={drawCard} disabled={!canDraw || gameOver}>Karte ziehen</button>
   </div>
   <div>
+    <h2>KI Karten:</h2>
+    <ul>
+      {#each aiCards as card}
+        <li
+          class="card"
+          style="background-color: {card.color};"
+          on:mouseover={() => hoveredCard = card}
+          on:mouseout={() => hoveredCard = null}
+        >
+          {card.number}
+        </li>
+      {/each}
+    </ul>
+  </div>
+  <div>
     <button on:click={runPrompt} disabled={gameOver}>KI Spielzug</button>
   </div>
   <div>
@@ -250,53 +250,3 @@ Which card will you play? If you need to draw a card, just say "draw".
     </div>
   {/if}
 </main>
-
-<style>
-  main {
-    text-align: center;
-  }
-  ul {
-    list-style-type: none;
-    padding: 0;
-  }
-  .card {
-    display: inline-block;
-    margin: 10px;
-    padding: 20px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    background-color: #f9f9f9;
-    cursor: pointer;
-    width: 100px;
-    height: 150px;
-    color: white;
-    font-size: 24px;
-    text-align: center;
-    line-height: 150px;
-  }
-  .card[style*="background-color: rot"] {
-    background-color: red;
-  }
-  .card[style*="background-color: gelb"] {
-    background-color: yellow;
-  }
-  .card[style*="background-color: grün"] {
-    background-color: green;
-  }
-  .card[style*="background-color: blau"] {
-    background-color: blue;
-  }
-  .tooltip {
-    position: absolute;
-    top: 50%;
-    left: 70%;
-    transform: translate(-50%, -50%);
-    background-color: rgba(0, 0, 0, 0.7);
-    color: white;
-    padding: 10px;
-    border-radius: 5px;
-    text-align: center;
-    font-size: 16px;
-    z-index: 1000;
-  }
-</style>
