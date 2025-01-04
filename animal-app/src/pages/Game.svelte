@@ -1,6 +1,8 @@
 <script>
   import { onMount } from 'svelte';
   import OpenAI from "openai";
+  import DrawCardButton from '../components/DrawCardButton.svelte';
+  import { gameStore } from '../store';
 
   const config = {
     apiKey: import.meta.env.VITE_OPENAI_API_KEY,
@@ -9,19 +11,36 @@
 
   const openai = new OpenAI(config);
 
-  let playerCards = [];
-  let aiCards = [];
-  let deck = [];
-  let discardPile = [];
-  let aiResponse = "";
-  let lastCard = null;
-  let canDraw = true;
-  let message = "";
-  let gameOver = false;
-  let hoveredCard = null;
-
+  let playerCards;
+  let aiCards;
+  let deck;
+  let discardPile;
+  let aiResponse;
+  let lastCard;
+  let canDraw;
+  let message;
+  let gameOver;
+  let hoveredCard;
   const colors = ['rot', 'gelb', 'grün', 'blau'];
   const numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+
+   
+  $: $gameStore, updateStore();
+
+function updateStore() {
+  ({
+    playerCards,
+    aiCards,
+    deck,
+    discardPile,
+    aiResponse,
+    lastCard,
+    canDraw,
+    message,
+    gameOver,
+    hoveredCard
+  } = $gameStore);
+}
 
   async function runPrompt() {
     try {
@@ -65,6 +84,7 @@ Which card will you play? If you need to draw a card, just say "draw".
           canDraw = true;       
           message = "";
           console.log("AI played:", aiCard);
+          gameStore.set({ playerCards, aiCards, deck, discardPile, lastCard, canDraw, message, gameOver, aiResponse, hoveredCard });
         } else {
           console.log("AI tried to play an invalid card, drawing instead.");        // wenn die Karte nicht passt, wird eine Karte gezogen
           drawCardForAI();
@@ -84,6 +104,7 @@ Which card will you play? If you need to draw a card, just say "draw".
     for (const color of colors) {
       for (const number of numbers) {
         newDeck.push({ color, number });
+        gameStore.set({ playerCards, aiCards, deck, discardPile, lastCard, canDraw, message, gameOver, aiResponse, hoveredCard });
       }
     }
     return newDeck;
@@ -93,6 +114,7 @@ Which card will you play? If you need to draw a card, just say "draw".
     for (let i = deck.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [deck[i], deck[j]] = [deck[j], deck[i]];
+      gameStore.set({ playerCards, aiCards, deck, discardPile, lastCard, canDraw, message, gameOver, aiResponse, hoveredCard });
     }
     return deck;
   }
@@ -106,6 +128,7 @@ Which card will you play? If you need to draw a card, just say "draw".
     canDraw = true;
     gameOver = false;
     message = "";
+    gameStore.set({ playerCards, aiCards, deck, discardPile, lastCard, canDraw, message, gameOver, aiResponse, hoveredCard });
   }
 
   function drawCard() {
@@ -114,6 +137,7 @@ Which card will you play? If you need to draw a card, just say "draw".
       playerCards = [...playerCards, drawnCard];
       canDraw = false;
       message = "Du kannst nur einmal pro Runde ziehen.";
+      gameStore.set({ playerCards, aiCards, deck, discardPile, lastCard, canDraw, message, gameOver, aiResponse, hoveredCard });
     } else if (deck.length === 0) {
       deck = shuffleDeck(discardPile.slice(0, -1));
       discardPile = [discardPile[discardPile.length - 1]];
@@ -121,8 +145,10 @@ Which card will you play? If you need to draw a card, just say "draw".
       playerCards = [...playerCards, drawnCard];
       canDraw = false; // Nur einmal ziehen erlaubt
       message = "Du kannst nur einmal pro Runde ziehen.";
+      gameStore.set({ playerCards, aiCards, deck, discardPile, lastCard, canDraw, message, gameOver, aiResponse, hoveredCard });
     } else {
       message = "Du kannst nur einmal pro Runde ziehen.";
+      gameStore.set({ playerCards, aiCards, deck, discardPile, lastCard, canDraw, message, gameOver, aiResponse, hoveredCard });
     }
     checkGameOver();
   }
@@ -132,6 +158,8 @@ Which card will you play? If you need to draw a card, just say "draw".
       const drawnCard = deck.pop();
       aiCards = [...aiCards, drawnCard];
       console.log("AI drew a card:", drawnCard);
+      canDraw = true;
+      gameStore.set({ playerCards, aiCards, deck, discardPile, lastCard, canDraw, message, gameOver, aiResponse, hoveredCard });
     } else {
       // wenn stapel leer, ablagestapel mischen und als neuen stapel verwenden
       deck = shuffleDeck(discardPile.slice(0, -1));
@@ -139,6 +167,8 @@ Which card will you play? If you need to draw a card, just say "draw".
       const drawnCard = deck.pop();
       aiCards = [...aiCards, drawnCard];
       console.log("AI drew a card from the reshuffled discard pile:", drawnCard);
+      canDraw = true;
+      gameStore.set({ playerCards, aiCards, deck, discardPile, lastCard, canDraw, message, gameOver, aiResponse, hoveredCard });
     }
     checkGameOver();
   }
@@ -150,8 +180,10 @@ Which card will you play? If you need to draw a card, just say "draw".
       lastCard = card;
       canDraw = true;
       message = "";
+      gameStore.set({ playerCards, aiCards, deck, discardPile, lastCard, canDraw, message, gameOver, aiResponse, hoveredCard });
     } else {
       message = "Du kannst diese Karte nicht spielen.";
+      gameStore.set({ playerCards, aiCards, deck, discardPile, lastCard, canDraw, message, gameOver, aiResponse, hoveredCard });
     }
     checkGameOver();
   }
@@ -160,9 +192,11 @@ Which card will you play? If you need to draw a card, just say "draw".
     if (playerCards.length === 0) {
       message = "Du hast gewonnen!";
       gameOver = true;
+      gameStore.set({ playerCards, aiCards, deck, discardPile, lastCard, canDraw, message, gameOver, aiResponse, hoveredCard });
     } else if (aiCards.length === 0) {
       message = "Die KI hat gewonnen!";
       gameOver = true;
+      gameStore.set({ playerCards, aiCards, deck, discardPile, lastCard, canDraw, message, gameOver, aiResponse, hoveredCard });
     }
   }
 
@@ -177,7 +211,7 @@ Which card will you play? If you need to draw a card, just say "draw".
 
 
 <main>
-  <h1>Miau Miau</h1>
+  <!-- <h1>Miau Miau</h1> -->
   <div>
     <h2>Deine Karten:</h2>
     <ul>
@@ -194,24 +228,30 @@ Which card will you play? If you need to draw a card, just say "draw".
       {/each}
     </ul>
   </div>
-  <div>
-    <h2>Ablagestapel:</h2>
-    <ul>
-      {#if lastCard}
-        <li
-          class="card"
-          style="background-color: {lastCard.color};"
-          on:mouseover={() => hoveredCard = lastCard}
-          on:mouseout={() => hoveredCard = null}
-        >
-          {lastCard.number}
-        </li>
-      {/if}
-    </ul>
+  <div class="discard-draw-container">
+    <div>
+      <h2>Ablagestapel:</h2>
+      <ul>
+        {#if lastCard}
+          <li
+            class="card"
+            style="background-color: {lastCard.color};"
+            on:mouseover={() => hoveredCard = lastCard}
+            on:mouseout={() => hoveredCard = null}
+          >
+            {lastCard.number}
+          </li>
+        {/if}
+      </ul>
+    </div>
+    <div>
+      <h2>Karte ziehen:</h2>
+      <DrawCardButton onDraw={drawCard} />
+    </div>
   </div>
-  <div>
+  <!-- <div>
     <button on:click={drawCard} disabled={!canDraw || gameOver}>Karte ziehen</button>
-  </div>
+  </div> -->
   <div>
     <h2>KI Karten:</h2>
     <ul>

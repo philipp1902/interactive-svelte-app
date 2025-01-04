@@ -1,0 +1,81 @@
+.draw-card-button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 10px;
+    padding: 20px;
+    border-radius: 5px;
+    background-color: #f8ddd9;
+    cursor: pointer;
+    width: 100px;
+    height: 150px;
+    color: #0B2B36;
+    font-size: 12px;
+    text-align: center;
+    line-height: auto;
+    transition: background 0.5s ease;
+  }
+
+  .draw-card-button:hover {
+    transition: scale 0.5s ease;
+    background-color: #dde185;
+    scale: 1.1;
+  }
+
+  @media (max-width: 600px) {
+      .draw-card-button {
+          width: 60px;
+          height: 90px;
+          font-size: 12px;
+          line-height: auto;
+          margin-left: 40px;
+      }
+  }
+
+
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: 10px;
+    justify-content: center;
+  }
+  .card {
+      display: inline-block;
+      margin: 10px;
+      padding: 20px;
+      /* border: 1px solid #ccc; */
+      border-radius: 5px;
+      background-color: #f9f9f9;
+      cursor: pointer;
+      width: 100px;
+      height: 150px;
+      color: black;
+      font-size: 24px;
+      text-align: center;
+      line-height: 110px;
+    }
+    .card[style*="background-color: rot"] {
+      background-color: #FF2A00;
+    }
+    .card[style*="background-color: gelb"] {
+      background-color: #FFDC00;
+    }
+    .card[style*="background-color: grün"] {
+      background-color: #009563;
+    }
+    .card[style*="background-color: blau"] {
+      background-color: #69DFDD;
+    }
+  /* 
+    .card:hover[style*="background-color: rot"] {
+      background-color: red;
+    }
+    .card[style*="background-color: gelb"] {
+      background-color: yellow;
+    }
+    .card[style*="background-color: grün"] {
+      background-color: green;
+    }
+    .card[style*="background-color: blau"] {
+      background-color: blue;
+    } */

@@ -110,18 +110,21 @@
     import Router from "svelte-spa-router";
     import LandingPage from "./pages/LandingPage.svelte";
     import Game from "./pages/Game.svelte";
+    import Explanation from "./pages/Explanation.svelte";
   
     const routes = {
       "/": LandingPage,
       "/game": Game,
+      "/explanation": Explanation,
     };
   </script>
   
   <header>
-    <h1>Miau Miau Test</h1>
+    <h1>Miau Miau</h1>
     <nav>
       <a href="#/">Home</a>
       <a href="#/game">Spiel</a>
+      <a href="#/explanation">Erklärung</a>
     </nav>
   </header>
   <main>
