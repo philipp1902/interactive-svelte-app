@@ -1,4 +1,3 @@
-/* Reset some default styles */
 * {
     margin: 0;
     padding: 0;
@@ -9,7 +8,6 @@
     /* overflow: scroll; */
 }
 
-/* Body styling */
 body {
     /* background: linear-gradient(135deg, #1e0233 0%, #6a0dad 50%, #d3d3d3 100%); */
     background-color: #0B2B36;
@@ -25,7 +23,6 @@ body {
     font-weight: 100;
 }
 
-/* Container styling */
 .container {
     background: #d3d3d3;
     border-radius: 10px;
@@ -36,7 +33,6 @@ body {
     text-align: center;
 }
 
-/* Header styling */
 h1 {
     font-size: 5rem;
     margin-bottom: 0px;
@@ -51,7 +47,6 @@ p {
     color: #DDE278;
 }
 
-/* Button styling */
 button {
     background: #DDE278;
     border: none;
@@ -107,40 +102,3 @@ button:hover {
     }
 }
 
-.discard-draw-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin: 20px 0;
-}
-
-.discard-draw-container div {
-  text-align: center;
-}
-
-.discard-draw-container .draw-card-button-container {
-  margin-left: 20px;
-}
-
-@media (max-width: 600px) {
-  .card-grid {
-      grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
-  }
-
-  .card {
-      width: 60px;
-      height: 90px;
-      font-size: 18px;
-      line-height: 90px;
-  }
-
-  .discard-draw-container {
-      flex-direction: column;
-      align-items: center;
-  }
-
-  .discard-draw-container .draw-card-button-container {
-      margin-left: 0;
-      margin-top: 20px;
-  }
-}

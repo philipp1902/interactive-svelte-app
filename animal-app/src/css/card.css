@@ -1,0 +1,129 @@
+.draw-card-button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 10px;
+    padding: 20px;
+    border-radius: 5px;
+    background-color: #f8ddd9;
+    cursor: pointer;
+    width: 100px;
+    height: 150px;
+    color: #0B2B36;
+    font-size: 12px;
+    text-align: center;
+    line-height: auto;
+    transition: background 0.5s ease;
+  }
+
+  .draw-card-button:hover {
+    transition: scale 0.5s ease;
+    background-color: #dde185;
+    scale: 1.05;
+    font-weight:bolder;
+  }
+
+  @media (max-width: 600px) {
+      .draw-card-button {
+          width: 60px;
+          height: 90px;
+          font-size: 12px;
+          line-height: auto;
+          margin-left: 20px;
+      }
+  }
+
+
+  .card-grid {
+    display: flex;
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: 10px;
+    justify-content: center;
+  }
+  .card {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin: 10px;
+      /* padding: 20px; */
+      border-radius: 5px;
+      background-color: #f9f9f9;
+      cursor: pointer;
+      width: 100px;
+      height: 150px;
+      color: black;
+      font-size: 24px;
+      text-align: center;
+    }
+    .card[style*="background-color: rot"] {
+      background-color: #FF2A00;
+    }
+    .card[style*="background-color: gelb"] {
+      background-color: #FFDC00;
+    }
+    .card[style*="background-color: grün"] {
+      background-color: #009563;
+    }
+    .card[style*="background-color: blau"] {
+      background-color: #69DFDD;
+    }
+
+    .card:hover[style*="background-color: rot"] {
+      background-color: #ff2a00e2;
+    }
+    .card:hover[style*="background-color: gelb"] {
+      background-color: #FFDC00e2;
+    }
+    .card:hover[style*="background-color: grün"] {
+      background-color: #009563e2;
+    }
+    .card:hover[style*="background-color: blau"] {
+      background-color: #69DFDDe2;
+    }
+
+    .card:hover {
+      transition: scale 0.5s ease;
+      scale: 1.05;
+      font-weight:bolder;
+    }
+
+    @media (max-width: 600px) {
+      .card-grid {
+          grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+      }
+    
+      .card {
+          width: 60px;
+          height: 90px;
+          font-size: 18px;
+          text-align: center;
+          
+      }
+    }
+
+    .discard-draw-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 20px 0;
+    }
+    
+    .discard-draw-container div {
+      text-align: center;
+    }
+    
+    .discard-draw-container .draw-card-button-container {
+      margin-left: 20px;
+    }
+    
+    @media (max-width: 600px) {
+      .discard-draw-container {
+          flex-direction: column;
+          align-items: center;
+      }
+    
+      .discard-draw-container .draw-card-button-container {
+          margin-left: 0;
+          margin-top: 20px;
+      }
+    }
