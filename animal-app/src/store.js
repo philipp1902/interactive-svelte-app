@@ -4,6 +4,7 @@ import { writable } from 'svelte/store';
 // export const lastAnimal = writable('');
 
 // export const count = writable(0);
+export const routerStore = writable(null);
 
 export const gameStore = writable({
     playerCards: [],

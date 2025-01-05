@@ -111,13 +111,14 @@
     import LandingPage from "./pages/LandingPage.svelte";
     import Game from "./pages/Game.svelte";
     import Explanation from "./pages/Explanation.svelte";
+
   
     const routes = {
       "/": LandingPage,
       "/game": Game,
       "/explanation": Explanation,
     };
-  </script>
+</script>
   
   <header>
     <h1>Miau Miau</h1>
@@ -129,6 +130,7 @@
   </header>
   <main>
     <Router {routes} />
+    <!-- <svelte:component this={currentRoute?.component} /> -->
   </main>
   
   <style>

@@ -21,6 +21,7 @@
   let message;
   let gameOver;
   let hoveredCard;
+  let tooltipText;
   const colors = ['rot', 'gelb', 'grün', 'blau'];
   const numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
@@ -96,6 +97,20 @@ Which card will you play? If you need to draw a card, just say "draw".
         "Error while retrieving the parental animals, Wikipedia link, or generating the image:",
         error,
       );
+    }
+  }
+
+  async function generateTooltipText(card) {        // entweder mit wiki api austauschen oder lassen -> gibt halt minimal delay
+    try {
+      const prompt = `Gib mir einen kurzen Satz über die Nummer ${card.number}.`;
+      const response = await openai.chat.completions.create({
+        model: "gpt-4o-mini",
+        messages: [{ role: "user", content: prompt }],
+      });
+      tooltipText = response.choices[0].message.content;
+    } catch (error) {
+      console.error("Error generating tooltip text:", error);
+      tooltipText = "Error generating tooltip text.";
     }
   }
 
@@ -213,46 +228,6 @@ Which card will you play? If you need to draw a card, just say "draw".
 <main>
   <!-- <h1>Miau Miau</h1> -->
   <div>
-    <h2>Deine Karten:</h2>
-    <ul>
-      {#each playerCards as card}
-        <li
-          class="card"
-          style="background-color: {card.color};"
-          on:mouseover={() => hoveredCard = card}
-          on:mouseout={() => hoveredCard = null}
-          on:click={() => playCard(card)}
-        >
-          {card.number}
-        </li>
-      {/each}
-    </ul>
-  </div>
-  <div class="discard-draw-container">
-    <div>
-      <h2>Ablagestapel:</h2>
-      <ul>
-        {#if lastCard}
-          <li
-            class="card"
-            style="background-color: {lastCard.color};"
-            on:mouseover={() => hoveredCard = lastCard}
-            on:mouseout={() => hoveredCard = null}
-          >
-            {lastCard.number}
-          </li>
-        {/if}
-      </ul>
-    </div>
-    <div>
-      <h2>Karte ziehen:</h2>
-      <DrawCardButton onDraw={drawCard} />
-    </div>
-  </div>
-  <!-- <div>
-    <button on:click={drawCard} disabled={!canDraw || gameOver}>Karte ziehen</button>
-  </div> -->
-  <div>
     <h2>KI Karten:</h2>
     <ul>
       {#each aiCards as card}
@@ -274,6 +249,46 @@ Which card will you play? If you need to draw a card, just say "draw".
     <h2>KI Antwort:</h2>
     <p>{aiResponse}</p>
   </div>
+  <div class="discard-draw-container">
+    <div>
+      <h2>Ablagestapel:</h2>
+      <ul>
+        {#if lastCard}
+          <li
+            class="card"
+            style="background-color: {lastCard.color};"
+            on:mouseover={() => { hoveredCard = lastCard; generateTooltipText(lastCard); }}
+            on:mouseout={() => hoveredCard = null}
+          >
+            {lastCard.number}
+          </li>
+        {/if}
+      </ul>
+    </div>
+    <div>
+      <h2>Karte ziehen:</h2>
+      <DrawCardButton onDraw={drawCard} />
+    </div>
+  </div>
+  <!-- <div>
+    <button on:click={drawCard} disabled={!canDraw || gameOver}>Karte ziehen</button>
+  </div> -->
+  <div>
+    <h2>Deine Karten:</h2>
+    <ul>
+      {#each playerCards as card}
+        <li
+          class="card"
+          style="background-color: {card.color};"
+          on:mouseover={() => { hoveredCard = card; generateTooltipText(card); }}
+          on:mouseout={() => hoveredCard = null}
+          on:click={() => playCard(card)}
+        >
+          {card.number}
+        </li>
+      {/each}
+    </ul>
+  </div>
   <div>
     <h2>Nachricht:</h2>
     <p>{message}</p>
@@ -287,6 +302,7 @@ Which card will you play? If you need to draw a card, just say "draw".
     <div class="tooltip">
       <p>Farbe: {hoveredCard.color}</p>
       <p>Zahl: {hoveredCard.number}</p>
+      <p>{tooltipText}</p>
     </div>
   {/if}
 </main>
