@@ -1,11 +1,8 @@
 <script>
   import { onMount } from 'svelte';
+  import OpenAI from "openai";
   import DrawCardButton from '../components/DrawCardButton.svelte';
   import { gameStore } from '../store';
-  import OpenAI from "openai";
-  import DrawTwoCard from '../components/DrawTwoCard.svelte';
-  import SkipCard from '../components/SkipCard.svelte';
-  import ColorChoiceCard from '../components/ColorChoiceCard.svelte';
 
   const config = {
     apiKey: import.meta.env.VITE_OPENAI_API_KEY,
@@ -25,61 +22,85 @@
   let gameOver;
   let hoveredCard;
   let tooltipText;
-  let chosenColor = '';
-  let colorChoiceMenuOpen = false;
   const colors = ['rot', 'gelb', 'grün', 'blau'];
-  const numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9];
-  const specialCards = ['Zieh 2', 'Aussetzen', 'Farbwahl'];
+  const numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
+   
   $: $gameStore, updateStore();
 
-  function updateStore() {
-    ({
-      playerCards,
-      aiCards,
-      deck,
-      discardPile,
-      aiResponse,
-      lastCard,
-      canDraw,
-      message,
-      gameOver,
-      hoveredCard
-    } = $gameStore);
-  }
+function updateStore() {
+  ({
+    playerCards,
+    aiCards,
+    deck,
+    discardPile,
+    aiResponse,
+    lastCard,
+    canDraw,
+    message,
+    gameOver,
+    hoveredCard
+  } = $gameStore);
+}
 
-  function aiPlayTurn() {
-    const playableCards = aiCards.filter(card =>
-      card.color === lastCard.color || card.number === lastCard.number || specialCards.includes(card.type)
-    );
+  async function runPrompt() {
+    try {
+      const prompt = `
+You are playing a card game similar to Uno, but with some differences. Here are the rules:
 
-    if (playableCards.length > 0) {
-      const aiCard = playableCards[Math.floor(Math.random() * playableCards.length)];
-      aiCards = aiCards.filter(card => card !== aiCard);
-      discardPile.push(aiCard);
-      lastCard = aiCard;
-      canDraw = true;
-      message = "";
-      if (aiCard.type === 'Zieh 2') {
-        drawCardForPlayer(2);
-      } else if (aiCard.type === 'Aussetzen') {
-        canDraw = false;
-      } else if (aiCard.type === 'Farbwahl') {
-        // Choose a random color from the AI's deck
-        const randomColorCard = aiCards[Math.floor(Math.random() * aiCards.length)];
-        chosenColor = randomColorCard.color;
-        lastCard.color = chosenColor;
-        gameStore.set({ playerCards, aiCards, deck, discardPile, lastCard, canDraw, message, gameOver, aiResponse, hoveredCard });
+1. The goal of the game is to be the first player to get rid of all your cards.
+2. Each player starts with 7 cards.
+3. The deck consists of cards with numbers from 1 to 10 in four colors: red, yellow, green, and blue.
+4. Players take turns playing cards from their hand that match the top card of the discard pile in either color or number.
+5. If a player cannot play a card, they must draw a card from the draw pile.
+6. The game continues until one player has no cards left.
+
+Your task is to play the game according to these rules. You will be given the top card of the discard pile and your hand of cards. You need to decide which card to play or if you need to draw a card.
+
+For example, if the top card of the discard pile is a red 5, you can play any red card or any 5 from your hand. If you don't have a matching card, you need to draw a card.
+
+Here is the current state of the game:
+- Top card of the discard pile: ${lastCard.color} ${lastCard.number}
+- Your hand: ${aiCards.map(card => `${card.color} ${card.number}`).join(', ')}
+
+Which card will you play? If you need to draw a card, just say "draw".
+      `;
+
+      const response = await openai.chat.completions.create({
+        model: "gpt-4o-mini",
+        messages: [{ role: "user", content: prompt }],
+      });
+
+      aiResponse = response.choices[0].message.content;
+      console.log("AI Response:", aiResponse);
+
+      if (aiResponse.toLowerCase().includes("draw")) {
+        drawCardForAI();
+      } else {
+        const aiCard = aiCards.find(card => aiResponse.includes(`${card.color} ${card.number}`));     // hier werden die Karten der KI mit den Karten verglichen, die sie spielen kann
+        if (aiCard && (aiCard.color === lastCard.color || aiCard.number === lastCard.number)) {       // wenn die Karte der KI passt, wird sie gespielt
+          aiCards = aiCards.filter(card => card !== aiCard);                                // die Karte wird aus der Hand der KI entfernt
+          discardPile.push(aiCard);                                                // die Karte wird auf den Ablagestapel gelegt
+          lastCard = aiCard;                                            // die Karte wird zur letzten Karte
+          canDraw = true;       
+          message = "";
+          console.log("AI played:", aiCard);
+          gameStore.set({ playerCards, aiCards, deck, discardPile, lastCard, canDraw, message, gameOver, aiResponse, hoveredCard });
+        } else {
+          console.log("AI tried to play an invalid card, drawing instead.");        // wenn die Karte nicht passt, wird eine Karte gezogen
+          drawCardForAI();
+        }
       }
-      console.log("AI played:", aiCard);
-      gameStore.set({ playerCards, aiCards, deck, discardPile, lastCard, canDraw, message, gameOver, aiResponse, hoveredCard });
-    } else {
-      drawCardForAI();
+      checkGameOver();
+    } catch (error) {
+      console.error(
+        "Error while retrieving the parental animals, Wikipedia link, or generating the image:",
+        error,
+      );
     }
-    checkGameOver();
   }
 
-  async function generateTooltipText(card) {
+  async function generateTooltipText(card) {        // entweder mit wiki api austauschen oder lassen -> gibt halt minimal delay
     try {
       const prompt = `Gib mir einen kurzen Satz über die Nummer ${card.number}.`;
       const response = await openai.chat.completions.create({
@@ -98,11 +119,7 @@
     for (const color of colors) {
       for (const number of numbers) {
         newDeck.push({ color, number });
-      }
-    }
-    for (const special of specialCards) {
-      for (let i = 0; i < 2; i++) {
-        newDeck.push({ type: special });
+        gameStore.set({ playerCards, aiCards, deck, discardPile, lastCard, canDraw, message, gameOver, aiResponse, hoveredCard });
       }
     }
     return newDeck;
@@ -112,6 +129,7 @@
     for (let i = deck.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [deck[i], deck[j]] = [deck[j], deck[i]];
+      gameStore.set({ playerCards, aiCards, deck, discardPile, lastCard, canDraw, message, gameOver, aiResponse, hoveredCard });
     }
     return deck;
   }
@@ -120,7 +138,7 @@
     deck = shuffleDeck(createDeck());
     playerCards = deck.slice(0, 7);
     aiCards = deck.slice(7, 14);
-    discardPile = [deck[14]];
+    discardPile = [deck[14]]; // erste karte im ablagestapel zum start
     lastCard = discardPile[0];
     canDraw = true;
     gameOver = false;
@@ -140,7 +158,7 @@
       discardPile = [discardPile[discardPile.length - 1]];
       const drawnCard = deck.pop();
       playerCards = [...playerCards, drawnCard];
-      canDraw = false;
+      canDraw = false; // Nur einmal ziehen erlaubt
       message = "Du kannst nur einmal pro Runde ziehen.";
       gameStore.set({ playerCards, aiCards, deck, discardPile, lastCard, canDraw, message, gameOver, aiResponse, hoveredCard });
     } else {
@@ -158,6 +176,7 @@
       canDraw = true;
       gameStore.set({ playerCards, aiCards, deck, discardPile, lastCard, canDraw, message, gameOver, aiResponse, hoveredCard });
     } else {
+      // wenn stapel leer, ablagestapel mischen und als neuen stapel verwenden
       deck = shuffleDeck(discardPile.slice(0, -1));
       discardPile = [discardPile[discardPile.length - 1]];
       const drawnCard = deck.pop();
@@ -169,51 +188,19 @@
     checkGameOver();
   }
 
-  function drawCardForPlayer(count) {
-    for (let i = 0; i < count; i++) {
-      if (deck.length > 0) {
-        const drawnCard = deck.pop();
-        playerCards = [...playerCards, drawnCard];
-      } else {
-        deck = shuffleDeck(discardPile.slice(0, -1));
-        discardPile = [discardPile[discardPile.length - 1]];
-        const drawnCard = deck.pop();
-        playerCards = [...playerCards, drawnCard];
-      }
-    }
-    canDraw = false;
-    message = `Du musst ${count} Karten ziehen.`;
-    gameStore.set({ playerCards, aiCards, deck, discardPile, lastCard, canDraw, message, gameOver, aiResponse, hoveredCard });
-  }
-
   function playCard(card) {
-    if (card.type === 'Farbwahl') {
+    if (card.color === lastCard.color || card.number === lastCard.number) {
+      playerCards = playerCards.filter(c => c !== card);
       discardPile.push(card);
       lastCard = card;
-      colorChoiceMenuOpen = true;
+      canDraw = true;
+      message = "";
       gameStore.set({ playerCards, aiCards, deck, discardPile, lastCard, canDraw, message, gameOver, aiResponse, hoveredCard });
-      removeCard(card);
-      return;
+    } else {
+      message = "Du kannst diese Karte nicht spielen.";
+      gameStore.set({ playerCards, aiCards, deck, discardPile, lastCard, canDraw, message, gameOver, aiResponse, hoveredCard });
     }
-    playerCards = playerCards.filter(c => c !== card);
-    discardPile.push(card);
-    lastCard = card;
-    canDraw = true;
-    message = "";
-    if (card.type === 'Zieh 2') {
-      drawCardForAI(2);
-    } else if (card.type === 'Aussetzen') {
-      canDraw = false;
-    }
-    gameStore.set({ playerCards, aiCards, deck, discardPile, lastCard, canDraw, message, gameOver, aiResponse, hoveredCard });
     checkGameOver();
-  }
-
-  function handleColorChoice(color) {
-    chosenColor = color;
-    lastCard.color = chosenColor;
-    colorChoiceMenuOpen = false;
-    gameStore.set({ playerCards, aiCards, deck, discardPile, lastCard, canDraw, message, gameOver, aiResponse, hoveredCard });
   }
 
   function checkGameOver() {
@@ -232,43 +219,31 @@
     dealCards();
   }
 
-  function removeCard(card) {
-    playerCards = playerCards.filter(c => c !== card);
-    discardPile.push(card);
-    lastCard = card;
-    canDraw = true;
-    message = "";
-    gameStore.set({ playerCards, aiCards, deck, discardPile, lastCard, canDraw, message, gameOver, aiResponse, hoveredCard });
-    checkGameOver();
-  }
-
   onMount(() => {
     dealCards();
   });
 </script>
 
+
 <main>
+  <!-- <h1>Miau Miau</h1> -->
   <div>
     <h2>KI Karten:</h2>
     <ul>
       {#each aiCards as card}
         <li
-          class={`card ${card.type ? 'special ' + card.type.toLowerCase().replace(' ', '-') : ''}`}
+          class="card"
           style="background-color: {card.color};"
           on:mouseover={() => hoveredCard = card}
           on:mouseout={() => hoveredCard = null}
         >
-          {#if card.type}
-            {card.type}
-          {:else}
-            {card.number}
-          {/if}
+          {card.number}
         </li>
       {/each}
     </ul>
   </div>
   <div>
-    <button on:click={aiPlayTurn} disabled={gameOver}>KI Spielzug</button>
+    <button on:click={runPrompt} disabled={gameOver}>KI Spielzug</button>
   </div>
   <div>
     <h2>KI Antwort:</h2>
@@ -280,16 +255,12 @@
       <ul>
         {#if lastCard}
           <li
-            class={`card ${lastCard.type ? 'special ' + lastCard.type.toLowerCase().replace(' ', '-') : ''}`}
-            style="background-color: {lastCard.color};" 
+            class="card"
+            style="background-color: {lastCard.color};"
             on:mouseover={() => { hoveredCard = lastCard; generateTooltipText(lastCard); }}
             on:mouseout={() => hoveredCard = null}
           >
-            {#if lastCard.type}
-              {lastCard.type}
-            {:else}
-              {lastCard.number}
-          {/if}
+            {lastCard.number}
           </li>
         {/if}
       </ul>
@@ -299,29 +270,25 @@
       <DrawCardButton onDraw={drawCard} />
     </div>
   </div>
+  <!-- <div>
+    <button on:click={drawCard} disabled={!canDraw || gameOver}>Karte ziehen</button>
+  </div> -->
   <div>
     <h2>Deine Karten:</h2>
     <ul>
       {#each playerCards as card}
         <li
-          class={`card ${card.type ? 'special ' + card.type.toLowerCase().replace(' ', '-') : ''}`}
+          class="card"
           style="background-color: {card.color};"
           on:mouseover={() => { hoveredCard = card; generateTooltipText(card); }}
           on:mouseout={() => hoveredCard = null}
           on:click={() => playCard(card)}
         >
-          {#if card.type}
-            {card.type}
-          {:else}
-            {card.number}
-          {/if}
+          {card.number}
         </li>
       {/each}
     </ul>
   </div>
-  {#if colorChoiceMenuOpen}
-  <ColorChoiceCard onPlay={() => {}} onColorChoice={handleColorChoice} />
-{/if}
   <div>
     <h2>Nachricht:</h2>
     <p>{message}</p>
@@ -333,12 +300,8 @@
   {/if}
   {#if hoveredCard}
     <div class="tooltip">
-      {#if hoveredCard.type}
-        <p>Typ: {hoveredCard.type}</p>
-      {:else}
-        <p>Farbe: {hoveredCard.color}</p>
-        <p>Zahl: {hoveredCard.number}</p>
-      {/if}
+      <p>Farbe: {hoveredCard.color}</p>
+      <p>Zahl: {hoveredCard.number}</p>
       <p>{tooltipText}</p>
     </div>
   {/if}

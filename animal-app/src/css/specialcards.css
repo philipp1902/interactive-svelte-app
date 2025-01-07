@@ -1,0 +1,37 @@
+.card.special {
+  border: 2px solid #ff9900; /* Darker gold border */
+  font-size: 18px;
+}
+
+.card.special.draw-two {
+  border: 2px solid #ff0000; /* Darker red border */
+}
+
+.card.special.skip {
+  border: 2px solid #0073e6; /* Darker blue border */
+}
+
+.card.special.color-choice {
+  border: 2px solid #00cc00; /* Darker green border */
+}
+
+.card.special.draw-two::before {
+  content: "🃏"; /* Unicode for a card symbol */
+  display: block;
+  font-size: 24px;
+  margin-bottom: 5px;
+}
+
+.card.special.skip::before {
+  content: "🚫"; /* Unicode for a prohibited symbol */
+  display: block;
+  font-size: 24px;
+  margin-bottom: 5px;
+}
+
+.card.special.color-choice::before {
+  content: "🎨"; /* Unicode for a paint palette symbol */
+  display: block;
+  font-size: 24px;
+  margin-bottom: 5px;
+}
