@@ -28,7 +28,7 @@
   let chosenColor = '';
   let colorChoiceMenuOpen = false;
   const colors = ['rot', 'gelb', 'grün', 'blau'];
-  const numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+  const numbers = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
   const specialCards = ['Zieh 2', 'Aussetzen', 'Farbwahl'];
 
   $: $gameStore, updateStore();
@@ -49,8 +49,18 @@
   }
 
   function aiPlayTurn() {
+    if (!canDraw) {
+      canDraw = true;
+      message = "Du darfst keine Karte ablegen.";
+      gameStore.set({ playerCards, aiCards, deck, discardPile, lastCard, canDraw, message, gameOver, aiResponse, hoveredCard });
+      return;
+    }
+
     const playableCards = aiCards.filter(card =>
-      card.color === lastCard.color || card.number === lastCard.number || specialCards.includes(card.type)
+      card.color === lastCard.color ||
+      card.number === lastCard.number ||
+      (specialCards.includes(card.type) && card.type === lastCard.type)||
+      (card.type === 'Zieh 2' && (card.color === lastCard.color || lastCard.type === 'Zieh 2'))
     );
 
     if (playableCards.length > 0) {
@@ -65,7 +75,6 @@
       } else if (aiCard.type === 'Aussetzen') {
         canDraw = false;
       } else if (aiCard.type === 'Farbwahl') {
-        // Choose a random color from the AI's deck
         const randomColorCard = aiCards[Math.floor(Math.random() * aiCards.length)];
         chosenColor = randomColorCard.color;
         lastCard.color = chosenColor;
@@ -74,7 +83,8 @@
       console.log("AI played:", aiCard);
       gameStore.set({ playerCards, aiCards, deck, discardPile, lastCard, canDraw, message, gameOver, aiResponse, hoveredCard });
     } else {
-      drawCardForAI();
+      drawCardForAI(1);
+      aiPlayTurn(); // AI should try to play again after drawing a card
     }
     checkGameOver();
   }
@@ -101,8 +111,14 @@
       }
     }
     for (const special of specialCards) {
-      for (let i = 0; i < 2; i++) {
-        newDeck.push({ type: special });
+      if (special === 'Aussetzen' || special === 'Zieh 2') {
+        for (const color of colors) {
+          newDeck.push({ type: special, color });
+        }
+      } else {
+        for (let i = 0; i < 4; i++) {
+          newDeck.push({ type: special });
+        }
       }
     }
     return newDeck;
@@ -150,23 +166,25 @@
     checkGameOver();
   }
 
-  function drawCardForAI() {
-    if (deck.length > 0) {
-      const drawnCard = deck.pop();
-      aiCards = [...aiCards, drawnCard];
-      console.log("AI drew a card:", drawnCard);
-      canDraw = true;
-      gameStore.set({ playerCards, aiCards, deck, discardPile, lastCard, canDraw, message, gameOver, aiResponse, hoveredCard });
-    } else {
-      deck = shuffleDeck(discardPile.slice(0, -1));
-      discardPile = [discardPile[discardPile.length - 1]];
-      const drawnCard = deck.pop();
-      aiCards = [...aiCards, drawnCard];
-      console.log("AI drew a card from the reshuffled discard pile:", drawnCard);
-      canDraw = true;
-      gameStore.set({ playerCards, aiCards, deck, discardPile, lastCard, canDraw, message, gameOver, aiResponse, hoveredCard });
+  function drawCardForAI(count) {
+    for (let i = 0; i < count; i++) {
+      if (deck.length > 0) {
+        const drawnCard = deck.pop();
+        aiCards = [...aiCards, drawnCard];
+        console.log("AI drew a card:", drawnCard);
+        canDraw = true;
+        gameStore.set({ playerCards, aiCards, deck, discardPile, lastCard, canDraw, message, gameOver, aiResponse, hoveredCard });
+      } else {
+        deck = shuffleDeck(discardPile.slice(0, -1));
+        discardPile = [discardPile[discardPile.length - 1]];
+        const drawnCard = deck.pop();
+        aiCards = [...aiCards, drawnCard];
+        console.log("AI drew a card from the reshuffled discard pile:", drawnCard);
+        canDraw = true;
+        gameStore.set({ playerCards, aiCards, deck, discardPile, lastCard, canDraw, message, gameOver, aiResponse, hoveredCard });
+      }
+      checkGameOver();
     }
-    checkGameOver();
   }
 
   function drawCardForPlayer(count) {
@@ -195,6 +213,17 @@
       removeCard(card);
       return;
     }
+
+    if (
+      (card.color !== lastCard.color && card.number !== lastCard.number) ||
+      (card.type === 'Aussetzen' && lastCard.type !== 'Aussetzen' && card.color !== lastCard.color) ||
+      (card.type === 'Zieh 2' && lastCard.type !== 'Zieh 2' && card.color !== lastCard.color)
+    ) {
+      message = "Du kannst diese Karte nicht ablegen.";
+      gameStore.set({ playerCards, aiCards, deck, discardPile, lastCard, canDraw, message, gameOver, aiResponse, hoveredCard });
+      return;
+    }
+
     playerCards = playerCards.filter(c => c !== card);
     discardPile.push(card);
     lastCard = card;
@@ -204,6 +233,8 @@
       drawCardForAI(2);
     } else if (card.type === 'Aussetzen') {
       canDraw = false;
+      message = "Der Gegner darf keine Karte ablegen.";
+      aiPlayTurn(); // AI should play immediately after the skip card
     }
     gameStore.set({ playerCards, aiCards, deck, discardPile, lastCard, canDraw, message, gameOver, aiResponse, hoveredCard });
     checkGameOver();
@@ -281,7 +312,7 @@
         {#if lastCard}
           <li
             class={`card ${lastCard.type ? 'special ' + lastCard.type.toLowerCase().replace(' ', '-') : ''}`}
-            style="background-color: {lastCard.color};" 
+            style="background-color: {lastCard.color};"
             on:mouseover={() => { hoveredCard = lastCard; generateTooltipText(lastCard); }}
             on:mouseout={() => hoveredCard = null}
           >

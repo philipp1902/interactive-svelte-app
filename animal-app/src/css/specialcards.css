@@ -1,5 +1,5 @@
 .card.special {
-  border: 2px solid #ff9900; /* Darker gold border */
+  /* border: 2px solid #ff9900;  */
   font-size: 18px;
 }
 
@@ -15,12 +15,12 @@
   border: 2px solid #00cc00; /* Darker green border */
 }
 
-.card.special.draw-two::before {
-  content: "🃏"; /* Unicode for a card symbol */
+/* .card.special.draw-two::before {
+  content: "🃏"; 
   display: block;
   font-size: 24px;
   margin-bottom: 5px;
-}
+} */
 
 .card.special.skip::before {
   content: "🚫"; /* Unicode for a prohibited symbol */
