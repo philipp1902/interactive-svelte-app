@@ -17,6 +17,7 @@
     "@sveltejs/kit": "^2.15.1",
     "dotenv": "^16.4.7",
     "openai": "^4.76.0",
+    "svelte-motion": "^0.12.2",
     "svelte-spa-router": "^4.0.1"
   }
 }

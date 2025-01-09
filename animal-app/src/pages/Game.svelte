@@ -29,7 +29,7 @@
   let colorChoiceMenuOpen = false;
   const colors = ['rot', 'gelb', 'grün', 'blau'];
   const numbers = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
-  const specialCards = ['Zieh 2', 'Aussetzen', 'Farbwahl'];
+  const specialCards = ['Zieh 2', 'Aussetzen', 'Farbwahl', 'Tauschen'];
 
   $: $gameStore, updateStore();
 
@@ -49,59 +49,66 @@
   }
 
   function aiPlayTurn() {
-    if (!canDraw) {
-      canDraw = true;
-      message = "Du darfst keine Karte ablegen.";
-      gameStore.set({ playerCards, aiCards, deck, discardPile, lastCard, canDraw, message, gameOver, aiResponse, hoveredCard });
-      return;
-    }
-
-    const playableCards = aiCards.filter(card =>
-      card.color === lastCard.color ||
-      card.number === lastCard.number ||
-      (specialCards.includes(card.type) && card.type === lastCard.type)||
-      (card.type === 'Zieh 2' && (card.color === lastCard.color || lastCard.type === 'Zieh 2'))
-    );
-
-    if (playableCards.length > 0) {
-      const aiCard = playableCards[Math.floor(Math.random() * playableCards.length)];
-      aiCards = aiCards.filter(card => card !== aiCard);
-      discardPile.push(aiCard);
-      lastCard = aiCard;
-      canDraw = true;
-      message = "";
-      if (aiCard.type === 'Zieh 2') {
-        drawCardForPlayer(2);
-      } else if (aiCard.type === 'Aussetzen') {
-        canDraw = false;
-      } else if (aiCard.type === 'Farbwahl') {
-        const randomColorCard = aiCards[Math.floor(Math.random() * aiCards.length)];
-        chosenColor = randomColorCard.color;
-        lastCard.color = chosenColor;
-        gameStore.set({ playerCards, aiCards, deck, discardPile, lastCard, canDraw, message, gameOver, aiResponse, hoveredCard });
-      }
-      console.log("AI played:", aiCard);
-      gameStore.set({ playerCards, aiCards, deck, discardPile, lastCard, canDraw, message, gameOver, aiResponse, hoveredCard });
-    } else {
-      drawCardForAI(1);
-      aiPlayTurn(); // AI should try to play again after drawing a card
-    }
-    checkGameOver();
+  if (!canDraw) {
+    canDraw = true;
+    message = "Du darfst keine Karte ablegen.";
+    gameStore.set({ playerCards, aiCards, deck, discardPile, lastCard, canDraw, message, gameOver, aiResponse, hoveredCard });
+    return;
   }
 
-  async function generateTooltipText(card) {
-    try {
-      const prompt = `Gib mir einen kurzen Satz über die Nummer ${card.number}.`;
-      const response = await openai.chat.completions.create({
-        model: "gpt-4o-mini",
-        messages: [{ role: "user", content: prompt }],
-      });
-      tooltipText = response.choices[0].message.content;
-    } catch (error) {
-      console.error("Error generating tooltip text:", error);
-      tooltipText = "Error generating tooltip text.";
+  const playableCards = aiCards.filter(card =>
+    (card.color === lastCard.color && card.type !== 'Farbwahl') ||
+    card.number === lastCard.number ||
+    (specialCards.includes(card.type) && card.type === lastCard.type) ||
+    (card.type === 'Aussetzen' && (card.color === lastCard.color || lastCard.type === 'Aussetzen')) ||      // iwie legt es das trotzdem auf die karte wo es bock hat
+    (card.type === 'Zieh 2' && (card.color === lastCard.color || lastCard.type === 'Zieh 2')) ||
+    (card.type === 'Tauschen' && (card.color === lastCard.color || lastCard.type === 'Tauschen')) ||
+    (card.type === 'Farbwahl')
+  );
+
+  if (playableCards.length > 0) {
+    const aiCard = playableCards[Math.floor(Math.random() * playableCards.length)];
+    aiCards = aiCards.filter(card => card !== aiCard);
+    discardPile.push(aiCard);
+    lastCard = aiCard;
+    canDraw = true;
+    message = "";
+    if (aiCard.type === 'Zieh 2') {
+      drawCardForPlayer(2);
+    } else if (aiCard.type === 'Aussetzen') {
+      canDraw = false;
+    } else if (aiCard.type === 'Farbwahl') {
+      const randomColorCard = aiCards[Math.floor(Math.random() * aiCards.length)];
+      chosenColor = randomColorCard.color;
+      lastCard.color = chosenColor;
+      gameStore.set({ playerCards, aiCards, deck, discardPile, lastCard, canDraw, message, gameOver, aiResponse, hoveredCard });
+    } else if (aiCard.type === 'Tauschen') {
+      swapRandomCards();
     }
+    console.log("AI played:", aiCard);
+    gameStore.set({ playerCards, aiCards, deck, discardPile, lastCard, canDraw, message, gameOver, aiResponse, hoveredCard });
+  } else {
+    drawCardForAI(1);
+    aiPlayTurn(); // AI should try to play again after drawing a card
   }
+  checkGameOver();
+}
+
+
+async function generateTooltipText(card) {
+  if (!card || !card.number) return;
+  try {
+    const prompt = `Gib mir einen kurzen Satz über die Nummer ${card.number}.`;
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: [{ role: "user", content: prompt }],
+    });
+    tooltipText = response.choices[0].message.content;
+  } catch (error) {
+    console.error("Error generating tooltip text:", error);
+    tooltipText = "Error generating tooltip text.";
+  }
+}
 
   function createDeck() {
     const newDeck = [];
@@ -111,7 +118,7 @@
       }
     }
     for (const special of specialCards) {
-      if (special === 'Aussetzen' || special === 'Zieh 2') {
+      if (special === 'Aussetzen' || special === 'Zieh 2' || special === 'Tauschen') {
         for (const color of colors) {
           newDeck.push({ type: special, color });
         }
@@ -216,12 +223,23 @@
 
     if (
       (card.color !== lastCard.color && card.number !== lastCard.number) ||
+      (lastCard.type === 'Farbwahl' && card.color !== chosenColor) ||
       (card.type === 'Aussetzen' && lastCard.type !== 'Aussetzen' && card.color !== lastCard.color) ||
-      (card.type === 'Zieh 2' && lastCard.type !== 'Zieh 2' && card.color !== lastCard.color)
+      (card.type === 'Zieh 2' && lastCard.type !== 'Zieh 2' && card.color !== lastCard.color) ||
+      (card.type === 'Tauschen' && lastCard.type !== 'Tauschen' && card.color !== lastCard.color) 
     ) {
       message = "Du kannst diese Karte nicht ablegen.";
       gameStore.set({ playerCards, aiCards, deck, discardPile, lastCard, canDraw, message, gameOver, aiResponse, hoveredCard });
       return;
+    }
+ 
+    if (card.type === 'Tauschen') {
+    discardPile.push(card); // Ensure the swap card is placed on the discard pile
+    lastCard = card;
+    swapRandomCards();
+    playerCards = playerCards.filter(c => c !== card); // Remove the swap card from the player's hand
+    gameStore.set({ playerCards, aiCards, deck, discardPile, lastCard, canDraw, message, gameOver, aiResponse, hoveredCard });
+    return;
     }
 
     playerCards = playerCards.filter(c => c !== card);
@@ -232,13 +250,13 @@
     if (card.type === 'Zieh 2') {
       drawCardForAI(2);
     } else if (card.type === 'Aussetzen') {
-      canDraw = false;
-      message = "Der Gegner darf keine Karte ablegen.";
-      aiPlayTurn(); // AI should play immediately after the skip card
-    }
-    gameStore.set({ playerCards, aiCards, deck, discardPile, lastCard, canDraw, message, gameOver, aiResponse, hoveredCard });
-    checkGameOver();
+    canDraw = false;
+    message = "Der Gegner darf keine Karte ablegen.";
+    aiPlayTurn(); // AI should play immediately after the skip card
   }
+  gameStore.set({ playerCards, aiCards, deck, discardPile, lastCard, canDraw, message, gameOver, aiResponse, hoveredCard });
+  checkGameOver();
+}
 
   function handleColorChoice(color) {
     chosenColor = color;
@@ -246,6 +264,25 @@
     colorChoiceMenuOpen = false;
     gameStore.set({ playerCards, aiCards, deck, discardPile, lastCard, canDraw, message, gameOver, aiResponse, hoveredCard });
   }
+
+  function swapRandomCards() {
+  const randomPlayerCardIndex = Math.floor(Math.random() * playerCards.length);
+  const randomAiCardIndex = Math.floor(Math.random() * aiCards.length);
+
+  const tempCard = playerCards[randomPlayerCardIndex];
+  playerCards[randomPlayerCardIndex] = aiCards[randomAiCardIndex];
+  aiCards[randomAiCardIndex] = tempCard;
+  // sichergehen, dass die KI nicht die Tauschkarte bekommt -> funkt aber iwie noch nicht komischerweise
+  if (aiCards[randomAiCardIndex].type === 'Tauschen') {
+    const newRandomAiCardIndex = aiCards.findIndex(card => card.type !== 'Tauschen');
+    if (newRandomAiCardIndex !== -1) {
+      aiCards[randomAiCardIndex] = aiCards[newRandomAiCardIndex];
+      aiCards[newRandomAiCardIndex] = tempCard;
+    }
+  }
+  gameStore.set({ playerCards, aiCards, deck, discardPile, lastCard, canDraw, message, gameOver, aiResponse, hoveredCard });
+}
+
 
   function checkGameOver() {
     if (playerCards.length === 0) {
@@ -333,7 +370,7 @@
   <div>
     <h2>Deine Karten:</h2>
     <ul>
-      {#each playerCards as card}
+      {#each playerCards as card, index}
         <li
           class={`card ${card.type ? 'special ' + card.type.toLowerCase().replace(' ', '-') : ''}`}
           style="background-color: {card.color};"
@@ -374,3 +411,12 @@
     </div>
   {/if}
 </main>
+
+
+
+
+<!-- zieh 2 karten kann man immer noch auf andere karten legen -->
+
+
+
+<!-- wenn KI keine Karte legen kann, dann soll sie ziehen und dann nochmal versuchen zu legen -->
