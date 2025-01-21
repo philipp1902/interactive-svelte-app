@@ -5,11 +5,11 @@
     margin: 10px;
     padding: 20px;
     border-radius: 5px;
-    background-color: #f8ddd9;
+    background-color: #691807;
     cursor: pointer;
     width: 100px;
     height: 150px;
-    color: #0B2B36;
+    color: #F7EEDF;
     font-size: 12px;
     text-align: center;
     line-height: auto;
@@ -18,7 +18,7 @@
 
   .draw-card-button:hover {
     transition: scale 0.5s ease;
-    background-color: #dde185;
+    background-color: #801d09;
     scale: 1.05;
     font-weight:bolder;
   }
@@ -41,44 +41,45 @@
     justify-content: center;
   }
   .card {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      margin: 10px;
-      /* padding: 20px; */
-      border-radius: 5px;
-      background-color: #f9f9f9;
-      cursor: pointer;
-      width: 100px;
-      height: 150px;
-      color: black;
-      font-size: 24px;
-      text-align: center;
-    }
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin: 10px;
+    border-radius: 5px;
+    background-size: cover; /* Make sure the background image covers the entire card */
+    background-position: center; /* Center the background image */
+    background-repeat: no-repeat; /* Prevent the background image from repeating */
+    cursor: pointer;
+    width: 100px;
+    height: 150px;
+    color: black;    
+    font-size: 48px;
+    text-align: center;
+    border: 10px solid;
+}
     .card[style*="background-color: rot"] {
-      background-color: #FF2A00;
+      background-color: #F7562C;
     }
     .card[style*="background-color: gelb"] {
-      background-color: #FFDC00;
+      background-color: #FFAB24;
     }
     .card[style*="background-color: grün"] {
-      background-color: #009563;
+      background-color: #037A54;
     }
     .card[style*="background-color: blau"] {
-      background-color: #69DFDD;
+      background-color: #544CF5;
     }
-
     .card:hover[style*="background-color: rot"] {
-      background-color: #ff2a00e2;
+      background-color: #f65c36;
     }
     .card:hover[style*="background-color: gelb"] {
-      background-color: #FFDC00e2;
+      background-color: #fcb035;
     }
     .card:hover[style*="background-color: grün"] {
-      background-color: #009563e2;
+      background-color: #188965;
     }
     .card:hover[style*="background-color: blau"] {
-      background-color: #69DFDDe2;
+      background-color: #665eee;
     }
 
     .card:hover {
@@ -127,3 +128,41 @@
           margin-top: 20px;
       }
     }
+
+    .card .number {
+      font-size: 48px;
+      font-weight: bold;
+      color: black; /* Default color */
+  }
+  
+  .card .number.savanne {
+      color: #F7562C; /* Example color for Savanne habitat */
+  }
+  
+  .card .number.wüste {
+      color: #FFAB24; /* Example color for Wüste habitat */
+  }
+  
+  .card .number.ozean {
+      color: #544CF5; /* Example color for Ozean habitat */
+  }
+  
+  .card .number.regenwald {
+      color: #037A54; /* Example color for Regenwald habitat */
+  }
+
+  .card.savanne {
+    border-color: #F7562C;
+  }
+
+  .card.wüste {
+    border-color: #FFAB24;
+  }
+
+  .card.ozean {
+    border-color: #544CF5;
+  }
+
+  .card.regenwald {
+    border-color: #037A54;
+  }

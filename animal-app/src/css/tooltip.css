@@ -1,12 +1,18 @@
 .tooltip {
-    position: absolute;
-    top: 40%;
-    left: 90%;
-    transform: translate(-50%, -50%);
-    background-color: #195366;
-    padding: 10px;
-    border-radius: 5px;
-    text-align: center;
-    font-size: 16px;
-    z-index: 1000;
-  }
+  position: absolute;
+  top: 40%;
+  left: 80%;
+  transform: translate(-50%, -50%);
+  background-color: #232222;
+  padding: 10px;
+  border-radius: 5px;
+  text-align: left;
+  font-size: 16px;
+  z-index: 1000;
+  width: 25%;
+}
+
+/* .tooltip img {
+  display: block;
+  margin-top: 10px;
+} */

@@ -6,6 +6,7 @@
   import DrawTwoCard from '../components/DrawTwoCard.svelte';
   import SkipCard from '../components/SkipCard.svelte';
   import ColorChoiceCard from '../components/ColorChoiceCard.svelte';
+  import { animalImages } from '../animalImages.js';
 
   const config = {
     apiKey: import.meta.env.VITE_OPENAI_API_KEY,
@@ -27,9 +28,24 @@
   let tooltipText;
   let chosenColor = '';
   let colorChoiceMenuOpen = false;
+  // let koalaImageUrl = '';
   const colors = ['rot', 'gelb', 'grün', 'blau'];
-  const numbers = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+  const numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9];
   const specialCards = ['Zieh 2', 'Aussetzen', 'Farbwahl', 'Tauschen'];
+
+  const habitats = {
+    rot: 'Savanne',
+    gelb: 'Wüste',
+    blau: 'Ozean',
+    grün: 'Regenwald'
+  };
+
+  const animals = {
+    rot: ['Afrikanischer Löwe', 'Afrikanischer Elefant', 'Masai-Giraffe', 'Steppenzebra', 'Blaues Gnu', 'Gepard', 'Spitzmaulnashorn', 'Braune Hyäne', 'Afrikanischer Strauß'],
+    gelb: ['Dromedar', 'Fennek', 'Dünenskorpion', 'Sandchamäleon', 'Erdmännchen', 'Palmatogecko', 'Nubischer Geier', 'Goldene Radspinne', 'Westliche Diamant-Klapperschlange'],
+    blau: ['Blauwal', 'Gemeiner Delfin', 'Weißer Hai', 'Kurzschnäuziges Seepferdchen', 'Pazifischer Riesenkrake', 'Clownfisch', 'Unechte Karettschildkröte', 'Stechrochen', 'Kompassqualle'],
+    grün: ['Schwarzer Panther', 'Fischertukan', 'Kapuzineraffe', 'Hoffmanns Faultier', 'Großer Ameisenbär', 'Ara', 'Blauer Morphofalter', 'Pfeilgiftfrosch', 'Papageienschlange']
+  };
 
   $: $gameStore, updateStore();
 
@@ -57,8 +73,7 @@
   }
 
   const playableCards = aiCards.filter(card =>
-    (card.color === lastCard.color && card.type !== 'Farbwahl') ||
-    card.number === lastCard.number ||
+    (card.color === lastCard.color && card.type !== 'Farbwahl') || card.number === lastCard.number ||
     (specialCards.includes(card.type) && card.type === lastCard.type) ||
     (card.type === 'Aussetzen' && (card.color === lastCard.color || lastCard.type === 'Aussetzen')) ||      // iwie legt es das trotzdem auf die karte wo es bock hat
     (card.type === 'Zieh 2' && (card.color === lastCard.color || lastCard.type === 'Zieh 2')) ||
@@ -96,38 +111,81 @@
 
 
 async function generateTooltipText(card) {
-  if (!card || !card.number) return;
-  try {
-    const prompt = `Gib mir einen kurzen Satz über die Nummer ${card.number}.`;
-    const response = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
-      messages: [{ role: "user", content: prompt }],
-    });
-    tooltipText = response.choices[0].message.content;
-  } catch (error) {
-    console.error("Error generating tooltip text:", error);
-    tooltipText = "Error generating tooltip text.";
-  }
-}
+    if (!card || !card.number) return;
+    try {
+      const prompt = `Gib mir 3 sehr kurze Fakten über das Tier ${card.animal}. Maximal 10 Wörter pro Fakt. Als eine unordered list.`;
+      // const prompt = `Gib mir einen kurzen Satz über die Nummer ${card.number}.`;
+      const response = await openai.chat.completions.create({
+        model: "gpt-4o-mini",
+        messages: [{ role: "user", content: prompt }],
+      });
+      tooltipText = response.choices[0].message.content;
 
-  function createDeck() {
+      // const imagePrompt = `Erstelle ein realistisches und farbenfrohes Bild von einem Känguru mit einem leicht stilisierten Touch`;
+      // const imageResponse = await openai.images.generate({
+      //   prompt: imagePrompt,
+      //   n: 1,
+      //   size: "256x256",
+      // });
+      // koalaImageUrl = imageResponse.data[0].url;
+    } catch (error) {
+      console.error("Error generating tooltip text:", error);
+      tooltipText = "Error generating tooltip text.";
+    }
+  }
+
+//   async function loadCardImages() {
+//   for (let card of playerCards) {
+//     if (card.animal) {
+//       card.imageUrl = await getWikipediaImage(card.animal);
+//     }
+//   }
+//   for (let card of aiCards) {
+//     if (card.animal) {
+//       card.imageUrl = await getWikipediaImage(card.animal);
+//     }
+//   }
+//   if (lastCard && lastCard.animal) {
+//     lastCard.imageUrl = await getWikipediaImage(lastCard.animal);
+//   }
+//   gameStore.set({ playerCards, aiCards, deck, discardPile, lastCard, canDraw, message, gameOver, aiResponse, hoveredCard });
+// }
+
+
+function createDeck() {
     const newDeck = [];
+    let id = 0;
+    const animalIndex = {
+      rot: new Set(),
+      gelb: new Set(),
+      blau: new Set(),
+      grün: new Set()
+    };
+
     for (const color of colors) {
+      const shuffledAnimals = animals[color].slice().sort(() => Math.random() - 0.5);
+      let animalIndexCounter = 0;
+
       for (const number of numbers) {
-        newDeck.push({ color, number });
+        const animal = shuffledAnimals[animalIndexCounter];
+        animalIndex[color].add(animal);
+        newDeck.push({ id: id++, color, number, habitat: habitats[color], animal });
+        animalIndexCounter++;
       }
     }
+
     for (const special of specialCards) {
-      if (special === 'Aussetzen' || special === 'Zieh 2' || special === 'Tauschen') {
+      if (special === 'Aussetzen' || special === 'Zieh 2' || 'Tauschen') {
         for (const color of colors) {
-          newDeck.push({ type: special, color });
+          newDeck.push({ id: id++, type: special, color, habitat: habitats[color] });
         }
       } else {
         for (let i = 0; i < 4; i++) {
-          newDeck.push({ type: special });
+          newDeck.push({ id: id++, type: special, habitat: habitats[colors[i]] });
         }
       }
     }
+
     return newDeck;
   }
 
@@ -175,7 +233,7 @@ async function generateTooltipText(card) {
 
   function drawCardForAI(count) {
     for (let i = 0; i < count; i++) {
-      if (deck.length > 0) {
+      if (i+1<count) {            //neue bedingung
         const drawnCard = deck.pop();
         aiCards = [...aiCards, drawnCard];
         console.log("AI drew a card:", drawnCard);
@@ -234,10 +292,10 @@ async function generateTooltipText(card) {
     }
  
     if (card.type === 'Tauschen') {
-    discardPile.push(card); // Ensure the swap card is placed on the discard pile
+    discardPile.push(card); 
     lastCard = card;
     swapRandomCards();
-    playerCards = playerCards.filter(c => c !== card); // Remove the swap card from the player's hand
+    playerCards = playerCards.filter(c => c !== card); 
     gameStore.set({ playerCards, aiCards, deck, discardPile, lastCard, canDraw, message, gameOver, aiResponse, hoveredCard });
     return;
     }
@@ -252,13 +310,13 @@ async function generateTooltipText(card) {
     } else if (card.type === 'Aussetzen') {
     canDraw = false;
     message = "Der Gegner darf keine Karte ablegen.";
-    aiPlayTurn(); // AI should play immediately after the skip card
+    aiPlayTurn(); 
   }
   gameStore.set({ playerCards, aiCards, deck, discardPile, lastCard, canDraw, message, gameOver, aiResponse, hoveredCard });
   checkGameOver();
 }
 
-  function handleColorChoice(color) {
+function handleColorChoice(color) {
     chosenColor = color;
     lastCard.color = chosenColor;
     colorChoiceMenuOpen = false;
@@ -310,6 +368,15 @@ async function generateTooltipText(card) {
     checkGameOver();
   }
 
+  function getBackgroundImage(animal) {
+    const imageUrl = animalImages[animal] || 'default_image.jpg';
+    console.log(`Background image for ${animal}: ${imageUrl}`);
+    return imageUrl;
+  }
+  function getHabitatClass(habitat) {
+    return habitat.toLowerCase();
+  }
+
   onMount(() => {
     dealCards();
   });
@@ -321,20 +388,21 @@ async function generateTooltipText(card) {
     <ul>
       {#each aiCards as card}
         <li
-          class={`card ${card.type ? 'special ' + card.type.toLowerCase().replace(' ', '-') : ''}`}
-          style="background-color: {card.color};"
+          class={`card ${card.type ? 'special ' + card.type.toLowerCase().replace(' ', '-') : ''} ${getHabitatClass(card.habitat)}`}
+          style="background-color: {card.color}; background-image: url('{getBackgroundImage(card.animal)}');"
           on:mouseover={() => hoveredCard = card}
           on:mouseout={() => hoveredCard = null}
         >
           {#if card.type}
             {card.type}
           {:else}
-            {card.number}
+            <span class="number {getHabitatClass(card.habitat)}">{card.number}</span>
           {/if}
         </li>
       {/each}
     </ul>
   </div>
+  
   <div>
     <button on:click={aiPlayTurn} disabled={gameOver}>KI Spielzug</button>
   </div>
@@ -348,16 +416,16 @@ async function generateTooltipText(card) {
       <ul>
         {#if lastCard}
           <li
-            class={`card ${lastCard.type ? 'special ' + lastCard.type.toLowerCase().replace(' ', '-') : ''}`}
-            style="background-color: {lastCard.color};"
+            class={`card ${lastCard.type ? 'special ' + lastCard.type.toLowerCase().replace(' ', '-') : ''} ${getHabitatClass(lastCard.habitat)}`}
+            style="background-color: {lastCard.color}; background-image: url('{getBackgroundImage(lastCard.animal)}');"
             on:mouseover={() => { hoveredCard = lastCard; generateTooltipText(lastCard); }}
             on:mouseout={() => hoveredCard = null}
           >
             {#if lastCard.type}
               {lastCard.type}
             {:else}
-              {lastCard.number}
-          {/if}
+              <span class="number {getHabitatClass(lastCard.habitat)}">{lastCard.number}</span>
+            {/if}
           </li>
         {/if}
       </ul>
@@ -372,8 +440,9 @@ async function generateTooltipText(card) {
     <ul>
       {#each playerCards as card, index}
         <li
-          class={`card ${card.type ? 'special ' + card.type.toLowerCase().replace(' ', '-') : ''}`}
-          style="background-color: {card.color};"
+          class={`card ${card.type ? 'special ' + card.type.toLowerCase().replace(' ', '-') : ''} ${getHabitatClass(card.habitat)}`}
+          style="background-color: {card.color}; background-image: url('{getBackgroundImage(card.animal)}');"
+          data-card-id={card.id}
           on:mouseover={() => { hoveredCard = card; generateTooltipText(card); }}
           on:mouseout={() => hoveredCard = null}
           on:click={() => playCard(card)}
@@ -381,15 +450,15 @@ async function generateTooltipText(card) {
           {#if card.type}
             {card.type}
           {:else}
-            {card.number}
+            <span class="number {getHabitatClass(card.habitat)}">{card.number}</span>
           {/if}
         </li>
       {/each}
     </ul>
   </div>
   {#if colorChoiceMenuOpen}
-  <ColorChoiceCard onPlay={() => {}} onColorChoice={handleColorChoice} />
-{/if}
+    <ColorChoiceCard onPlay={() => {}} onColorChoice={handleColorChoice} />
+  {/if}
   <div>
     <h2>Nachricht:</h2>
     <p>{message}</p>
@@ -407,16 +476,24 @@ async function generateTooltipText(card) {
         <p>Farbe: {hoveredCard.color}</p>
         <p>Zahl: {hoveredCard.number}</p>
       {/if}
+      <p>Lebensraum: {hoveredCard.habitat}</p>
+      <p>Tier: {hoveredCard.animal}</p>
       <p>{tooltipText}</p>
     </div>
   {/if}
 </main>
 
-
+<style>
+  .card {
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+</style>
 
 
 <!-- zieh 2 karten kann man immer noch auf andere karten legen -->
 
 
 
-<!-- wenn KI keine Karte legen kann, dann soll sie ziehen und dann nochmal versuchen zu legen -->
+<!-- Informationen über Tiere auf Stapel hinzufügen -->
