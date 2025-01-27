@@ -120,14 +120,14 @@
     };
 </script>
   
-  <header>
+  <!-- <header>
     <h1>Miau Miau</h1>
     <nav>
       <a href="#/">Home</a>
       <a href="#/game">Spiel</a>
       <a href="#/explanation">Erklärung</a>
     </nav>
-  </header>
+  </header> -->
   <main>
     <Router {routes} />
     <!-- <svelte:component this={currentRoute?.component} /> -->

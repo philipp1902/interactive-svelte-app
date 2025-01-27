@@ -28,7 +28,6 @@
   let tooltipText;
   let chosenColor = '';
   let colorChoiceMenuOpen = false;
-  // let koalaImageUrl = '';
   const colors = ['rot', 'gelb', 'grün', 'blau'];
   const numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9];
   const specialCards = ['Zieh 2', 'Aussetzen', 'Farbwahl', 'Tauschen'];
@@ -381,10 +380,17 @@ function handleColorChoice(color) {
     dealCards();
   });
 </script>
-
+<header>
+  <h1>Miau Miau</h1>
+  <nav>
+    <a href="#/">Home</a>
+    <!-- <a href="#/game">Spiel</a>
+    <a href="#/explanation">Erklärung</a> -->
+  </nav>
+</header>
 <main>
   <div>
-    <h2>KI Karten:</h2>
+    <h2>KI Karten:</h2>         
     <ul>
       {#each aiCards as card}
         <li
@@ -457,8 +463,22 @@ function handleColorChoice(color) {
     </ul>
   </div>
   {#if colorChoiceMenuOpen}
-    <ColorChoiceCard onPlay={() => {}} onColorChoice={handleColorChoice} />
+    <div class="overlay">
+      <div class="color-choice-menu">
+        {#each colors as color}
+          <button on:click={() => handleColorChoice(color)} class={color}>{habitats[color]}</button>
+        {/each}
+      </div>
+    </div>
   {/if}
+  
+<!-- {#if colorChoiceMenuOpen}
+<div class="overlay">
+  <div class="color-choice-menu">
+    <ColorChoiceCard onColorChoice={handleColorChoice} />
+  </div>
+</div>
+{/if} -->
   <div>
     <h2>Nachricht:</h2>
     <p>{message}</p>
@@ -489,11 +509,13 @@ function handleColorChoice(color) {
     background-position: center;
     background-repeat: no-repeat;
   }
+
+  
 </style>
 
 
 <!-- zieh 2 karten kann man immer noch auf andere karten legen -->
-
+<!-- die karten rutschen unter den text bzw. ul class ist zu klein -->
 
 
 <!-- Informationen über Tiere auf Stapel hinzufügen -->

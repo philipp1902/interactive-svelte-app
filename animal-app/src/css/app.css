@@ -5,7 +5,7 @@
     font-family: 'Funnel Display', sans-serif;
     font-weight: normal;
     height: auto;
-    /* overflow: scroll; */
+    overflow: hidden;
 }
 
 body {
@@ -90,4 +90,5 @@ button:hover {
         margin: 5px 0;
     }
 }
+
 

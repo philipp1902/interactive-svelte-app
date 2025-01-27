@@ -19,6 +19,10 @@
   <button>
     <a href="#/game" style="text-decoration: none; color: inherit;">Spiel starten</a>
   </button>
+  <p>Klicke hier, um eine Einführung zu bekommen</p>
+  <button>
+    <a href="#/explanation" style="text-decoration: none; color: inherit;">Erklärung</a>
+  </button>
 </main>
 
 <style>

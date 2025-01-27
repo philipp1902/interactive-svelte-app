@@ -14,6 +14,7 @@
     text-align: center;
     line-height: auto;
     transition: background 0.5s ease;
+    overflow: hidden;
   }
 
   .draw-card-button:hover {
@@ -50,8 +51,8 @@
     background-position: center; /* Center the background image */
     background-repeat: no-repeat; /* Prevent the background image from repeating */
     cursor: pointer;
-    width: 100px;
-    height: 150px;
+    width: 15vh;
+    height: 22.5vh;
     color: black;    
     font-size: 48px;
     text-align: center;
@@ -99,6 +100,7 @@
           height: 90px;
           font-size: 18px;
           text-align: center;
+          border: 5px solid;
       }
     }
 
@@ -166,3 +168,74 @@
   .card.regenwald {
     border-color: #037A54;
   }
+
+  @media (max-width: 600px) {
+    .card .number {
+        font-size: 24px;
+    }
+  }
+  .overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.25); /* Semi-transparent background */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000; /* High z-index to ensure it appears above everything */
+  }
+
+  .color-choice-menu {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-top: 0px;
+    justify-content: center; /* Center the grid horizontally */
+  }
+
+  .color-choice-menu button {
+    width: 100px; 
+    height: 150px; 
+    margin: 0 0px;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    color: black;
+    background-color: white;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .color-choice-menu button:hover {
+    filter: brightness(85%);
+  }
+
+  .color-choice-menu .savanne {
+    background-color: #F7562C; /* Color for Savanne */
+  }
+
+  .color-choice-menu .wueste {
+    background-color: #FFAB24; /* Color for Wüste */
+  }
+
+  .color-choice-menu .ozean {
+    background-color: #544CF5; /* Color for Ozean */
+  }
+
+  .color-choice-menu .regenwald {
+    background-color: #037A54; /* Color for Regenwald */
+  }
+
+  button:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+  }
+
+
+  /* responsive strokes und schriftgrößen */
