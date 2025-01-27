@@ -1,241 +1,241 @@
 .draw-card-button {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin: 10px;
-    padding: 20px;
-    border-radius: 5px;
-    background-color: #691807;
-    cursor: pointer;
-    width: 100px;
-    height: 150px;
-    color: #F7EEDF;
-    font-size: 12px;
-    text-align: center;
-    line-height: auto;
-    transition: background 0.5s ease;
-    overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 10px;
+  padding: 20px;
+  border-radius: 5px;
+  background-color: #691807;
+  cursor: pointer;
+  width: 100px;
+  height: 150px;
+  color: #F7EEDF;
+  font-size: 12px;
+  text-align: center;
+  line-height: auto;
+  transition: background 0.5s ease;
+  overflow: hidden;
+}
+
+.draw-card-button:hover {
+  transition: scale 0.5s ease;
+  background-color: #801d09;
+  scale: 1.05;
+  font-weight:bolder;
+}
+
+@media (max-width: 600px) {
+    .draw-card-button {
+        width: 60px;
+        height: 90px;
+        font-size: 12px;
+        line-height: auto;
+        margin-left: 20px;
+    }
+}
+
+
+.card-grid {
+  display: flex;
+  grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+  gap: 10px;
+  justify-content: center;
+}
+.card {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin: 10px;
+  border-radius: 5px;
+  background-size: cover; /* Make sure the background image covers the entire card */
+  background-position: center; /* Center the background image */
+  background-repeat: no-repeat; /* Prevent the background image from repeating */
+  cursor: pointer;
+  width: 15vh;
+  height: 22.5vh;
+  color: black;    
+  font-size: 48px;
+  text-align: center;
+  border: 10px solid;
+}
+  .card[style*="background-color: rot"] {
+    background-color: #F7562C;
+  }
+  .card[style*="background-color: gelb"] {
+    background-color: #FFAB24;
+  }
+  .card[style*="background-color: grün"] {
+    background-color: #037A54;
+  }
+  .card[style*="background-color: blau"] {
+    background-color: #544CF5;
+  }
+  .card:hover[style*="background-color: rot"] {
+    background-color: #f65c36;
+  }
+  .card:hover[style*="background-color: gelb"] {
+    background-color: #fcb035;
+  }
+  .card:hover[style*="background-color: grün"] {
+    background-color: #188965;
+  }
+  .card:hover[style*="background-color: blau"] {
+    background-color: #665eee;
   }
 
-  .draw-card-button:hover {
+  .card:hover {
     transition: scale 0.5s ease;
-    background-color: #801d09;
     scale: 1.05;
     font-weight:bolder;
+    transform: translateY(-24px);
   }
 
   @media (max-width: 600px) {
-      .draw-card-button {
-          width: 60px;
-          height: 90px;
-          font-size: 12px;
-          line-height: auto;
-          margin-left: 20px;
-      }
+    .card-grid {
+        grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+    }
+  
+    .card {
+        width: 60px;
+        height: 90px;
+        font-size: 18px;
+        text-align: center;
+        border: 5px solid;
+    }
   }
 
-
-  .card-grid {
+  .discard-draw-container {
     display: flex;
-    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
-    gap: 10px;
     justify-content: center;
-  }
-  .card {
-    display: inline-flex;
     align-items: center;
-    justify-content: center;
-    margin: 10px;
-    border-radius: 5px;
-    background-size: cover; /* Make sure the background image covers the entire card */
-    background-position: center; /* Center the background image */
-    background-repeat: no-repeat; /* Prevent the background image from repeating */
-    cursor: pointer;
-    width: 15vh;
-    height: 22.5vh;
-    color: black;    
-    font-size: 48px;
+    margin: 20px 0;
+  }
+  
+  .discard-draw-container div {
     text-align: center;
-    border: 10px solid;
-}
-    .card[style*="background-color: rot"] {
-      background-color: #F7562C;
-    }
-    .card[style*="background-color: gelb"] {
-      background-color: #FFAB24;
-    }
-    .card[style*="background-color: grün"] {
-      background-color: #037A54;
-    }
-    .card[style*="background-color: blau"] {
-      background-color: #544CF5;
-    }
-    .card:hover[style*="background-color: rot"] {
-      background-color: #f65c36;
-    }
-    .card:hover[style*="background-color: gelb"] {
-      background-color: #fcb035;
-    }
-    .card:hover[style*="background-color: grün"] {
-      background-color: #188965;
-    }
-    .card:hover[style*="background-color: blau"] {
-      background-color: #665eee;
-    }
-
-    .card:hover {
-      transition: scale 0.5s ease;
-      scale: 1.05;
-      font-weight:bolder;
-      transform: translateY(-24px);
-    }
-
-    @media (max-width: 600px) {
-      .card-grid {
-          grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
-      }
-    
-      .card {
-          width: 60px;
-          height: 90px;
-          font-size: 18px;
-          text-align: center;
-          border: 5px solid;
-      }
-    }
-
-    .discard-draw-container {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      margin: 20px 0;
-    }
-    
-    .discard-draw-container div {
-      text-align: center;
-    }
-    
-    .discard-draw-container .draw-card-button-container {
-      margin-left: 20px;
-    }
-    
-    @media (max-width: 600px) {
-      .discard-draw-container {
-          flex-direction: column;
-          align-items: center;
-      }
-    
-      .discard-draw-container .draw-card-button-container {
-          margin-left: 0;
-          margin-top: 20px;
-      }
-    }
-
-    .card .number {
-      font-size: 48px;
-      font-weight: bold;
-      color: black; /* Default color */
   }
   
-  .card .number.savanne {
-      color: #F7562C; /* Example color for Savanne habitat */
+  .discard-draw-container .draw-card-button-container {
+    margin-left: 20px;
   }
   
-  .card .number.wüste {
-      color: #FFAB24; /* Example color for Wüste habitat */
-  }
-  
-  .card .number.ozean {
-      color: #544CF5; /* Example color for Ozean habitat */
-  }
-  
-  .card .number.regenwald {
-      color: #037A54; /* Example color for Regenwald habitat */
-  }
-
-  .card.savanne {
-    border-color: #F7562C;
-  }
-
-  .card.wüste {
-    border-color: #FFAB24;
-  }
-
-  .card.ozean {
-    border-color: #544CF5;
-  }
-
-  .card.regenwald {
-    border-color: #037A54;
-  }
-
   @media (max-width: 600px) {
-    .card .number {
-        font-size: 24px;
+    .discard-draw-container {
+        flex-direction: column;
+        align-items: center;
+    }
+  
+    .discard-draw-container .draw-card-button-container {
+        margin-left: 0;
+        margin-top: 20px;
     }
   }
-  .overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.25); /* Semi-transparent background */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000; /* High z-index to ensure it appears above everything */
+
+  .card .number {
+    font-size: 48px;
+    font-weight: bold;
+    color: black; /* Default color */
+}
+
+.card .number.savanne {
+    color: #F7562C; /* Example color for Savanne habitat */
+}
+
+.card .number.wüste {
+    color: #FFAB24; /* Example color for Wüste habitat */
+}
+
+.card .number.ozean {
+    color: #544CF5; /* Example color for Ozean habitat */
+}
+
+.card .number.regenwald {
+    color: #037A54; /* Example color for Regenwald habitat */
+}
+
+.card.savanne {
+  border-color: #F7562C;
+}
+
+.card.wüste {
+  border-color: #FFAB24;
+}
+
+.card.ozean {
+  border-color: #544CF5;
+}
+
+.card.regenwald {
+  border-color: #037A54;
+}
+
+@media (max-width: 600px) {
+  .card .number {
+      font-size: 24px;
   }
+}
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.25); /* Semi-transparent background */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000; /* High z-index to ensure it appears above everything */
+}
 
-  .color-choice-menu {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
-    margin-top: 0px;
-    justify-content: center; /* Center the grid horizontally */
-  }
+.color-choice-menu {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  margin-top: 0px;
+  justify-content: center; /* Center the grid horizontally */
+}
 
-  .color-choice-menu button {
-    width: 100px; 
-    height: 150px; 
-    margin: 0 0px;
-    padding: 10px;
-    border: none;
-    border-radius: 5px;
-    color: black;
-    background-color: white;
-    font-size: 16px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
+.color-choice-menu button {
+  width: 100px; 
+  height: 150px; 
+  margin: 0 0px;
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+  color: black;
+  background-color: white;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 
-  .color-choice-menu button:hover {
-    filter: brightness(85%);
-  }
+.color-choice-menu button:hover {
+  filter: brightness(85%);
+}
 
-  .color-choice-menu .savanne {
-    background-color: #F7562C; /* Color for Savanne */
-  }
+.color-choice-menu .savanne {
+  background-color: #F7562C; /* Color for Savanne */
+}
 
-  .color-choice-menu .wueste {
-    background-color: #FFAB24; /* Color for Wüste */
-  }
+.color-choice-menu .wueste {
+  background-color: #FFAB24; /* Color for Wüste */
+}
 
-  .color-choice-menu .ozean {
-    background-color: #544CF5; /* Color for Ozean */
-  }
+.color-choice-menu .ozean {
+  background-color: #544CF5; /* Color for Ozean */
+}
 
-  .color-choice-menu .regenwald {
-    background-color: #037A54; /* Color for Regenwald */
-  }
+.color-choice-menu .regenwald {
+  background-color: #037A54; /* Color for Regenwald */
+}
 
-  button:disabled {
-    background-color: #cccccc;
-    cursor: not-allowed;
-  }
+button:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
 
 
-  /* responsive strokes und schriftgrößen */
+/* responsive strokes und schriftgrößen */
