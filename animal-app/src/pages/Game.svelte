@@ -43,10 +43,10 @@
   };
 
   const myColors = {
-    gelb: "yellow",
-    grün: "green",
-    blau: "blue",
-    rot: "red",
+    gelb: "#FFAB24",
+    grün: "#037A54",
+    blau: "#544CF5",
+    rot: "#F7562C",
   };
 
   const animals = {
@@ -754,6 +754,7 @@
 
 <header>
   <h1>Miau Miau</h1>
+  <p>Du willst wissen, wie das Spiel funktioniert?<a href="#/explanation" style="text-decoration: underline;">Finde es hier raus!</a></p>
   <nav>
     <a href="#/">Home</a>
     <!-- <a href="#/game">Spiel</a>

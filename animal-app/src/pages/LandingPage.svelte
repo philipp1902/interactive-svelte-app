@@ -13,26 +13,66 @@
 </script>
 
 <main>
-  <h1>Willkommen zu Miau Miau</h1>
-  <p>Klicke auf den Button, um das Spiel zu starten.</p>
-  <!-- <button on:click={navigateToGame}>Spiel starten</button> -->
-  <button>
-    <a href="#/game" style="text-decoration: none; color: inherit;">Spiel starten</a>
-  </button>
-  <p>Klicke hier, um eine Einführung zu bekommen</p>
-  <button>
-    <a href="#/explanation" style="text-decoration: none; color: inherit;">Erklärung</a>
-  </button>
+  <div class="content-container">
+    <div class="text-content">
+      <h1>Willkommen in der wilden Welt von Miau Miau</h1> <br>
+      <p>Entdecke wilde Tiere, lerne spannende Fakten und erlebe tierischen Spielspaß – das Kartenspiel, das Wissen und Action verbindet!</p>
+      <button>
+        <a href="#/game" style="text-decoration: none; color: inherit;">Jetzt spielen</a>
+      </button>
+      <br><br><br><br>
+      <p>Du willst wissen, wie das Spiel funktioniert?<a href="#/explanation" style="text-decoration: underline;">Finde es hier raus!</a></p>
+    </div>
+    <div class="image-content">
+      <img src="/images/card-test.png" alt="Ein thematisches Bild" />
+    </div>
+  </div>
 </main>
 
 <style>
+  main {padding: 20px;}
+  :global(body) {
+    background-image: url('/images/Frontpage.png');
+    background-size: cover;
+    background-position: center;
+    margin: 0;
+    height: 100vh;
+    width: 100vw;
+  }
+
   main {
-    text-align: center;
     padding: 20px;
   }
-  button {
-    padding: 10px 20px;
-    font-size: 16px;
-    cursor: pointer;
+  .content-container {
+    display: flex;
+    gap: 20px; /* Abstand zwischen Text und Bild */
+    max-width: 100%; /* Maximale Breite des Containers */
+    align-items: center;
+  }
+  .text-content {
+    width: 50%;
+  }
+  .image-content {
+    flex: 1; /* Das Bild nimmt den restlichen Platz ein */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .image-content img {
+    max-width: 100%; /* Das Bild passt sich dem verfügbaren Platz an */
+    max-height: 100vh; /* Das Bild überschreitet nicht die Bildschirmhöhe */
+  }
+
+  @media (max-width: 1000px) {
+    .content-container {
+      flex-direction: column;
+    }
+    .image-content {
+      order: -1;
+    }
+    .text-content {
+      width: 100%;
+    }
   }
 </style>

@@ -5,7 +5,7 @@
     font-family: 'Funnel Display', sans-serif;
     font-weight: normal;
     height: auto;
-    overflow: hidden;
+    /* overflow: hidden; */
 }
 
 body {
@@ -37,48 +37,89 @@ h1 {
     font-size: 5rem;
     margin-bottom: 0px;
     color: #F7EEDF;
-    font-family: 'DynaPuff', sans-serif;
-    text-align: center;
+    font-family: 'Funnel Display', sans-serif;
+    font-weight: bolder;
+    text-align: left;
+    width: 100%;
+    padding: 20px;
+    padding-bottom: 10px;
+}
+
+h2 {
+    font-size: 1.5rem;
+    color: #F7EEDF;
+    font-family: 'Funnel Display', sans-serif;
+    font-weight: bolder;
+    text-align: left;
+    width: 100%;
+    padding: 20px;
+    padding-bottom: 10px;
+}
+
+ul {
+    list-style-type: square;
+    list-style-position: outside;
+    text-align: left;
+    font-size: 1.2rem;
+    font-family: 'Funnel Display', sans-serif;
+    padding-left: 40px;
 }
 
 p {
     font-size: 1.2rem;
     margin-bottom: 20px;
+    margin-left: 20px;
     color: #F7EEDF;
     /* font-size: 0.6rem;                  
     color: #1e0233; */
+    text-align: left;
+    width: 100%;
+    display: flex;
+    justify-content: left;
 }
 
 button {
-    background: #691807;
+    background: white;
     border: none;
     border-radius: 5px;
-    color: #F7EEDF;
+    color: black;
     cursor: pointer;
     font-size: 1rem;
-    padding: 10px 20px;
+    padding: 16px 48px;
     transition: background 0.3s ease;
-    margin: 12px;
+    /* margin-bottom: 16px; */
+    margin: 16px;
+    display: flex;
+    justify-content: left;
+    font-family: 'Funnel Display', sans-serif;
+    white-space: nowrap;
 }
 
 button:hover {
-    background: #801d09;
+    background: none;
+    font-weight: bolder;
+    border: white 2px solid;
+    color: white;
+    transition: background 0.7s ease;
+
 }
 
   a {
     font-size: 1.2rem;
     margin-bottom: 20px;
     color: #F7EEDF;
-    text-align: center;
+    text-align: left;
     text-decoration: none;
     display: block;
-    margin: 0 auto;
+    margin: 0;
   }
 
   a:hover {
-    color: #F7562C;
+    color: #fef9ff;
     text-decoration: underline;
     transition: text-decoration 0.3s ease;
+    font-weight: bolder;
+    transition: color 0.3s ease;
   }
 
   @media (max-width: 600px) {

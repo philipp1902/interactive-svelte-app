@@ -88,6 +88,7 @@
     scale: 1.05;
     font-weight:bolder;
     transform: translateY(-24px);
+    border: 10px solid;
   }
 
   @media (max-width: 600px) {
