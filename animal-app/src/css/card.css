@@ -1,5 +1,3 @@
-
-
 .card-grid {
   display: flex;
   grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));

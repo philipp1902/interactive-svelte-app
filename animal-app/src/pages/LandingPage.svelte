@@ -47,6 +47,8 @@
     display: flex;
     gap: 20px; /* Abstand zwischen Text und Bild */
     max-width: 100%; /* Maximale Breite des Containers */
+    gap: 20px;
+    max-width: 100%;
     align-items: center;
   }
   .text-content {
@@ -54,6 +56,7 @@
   }
   .image-content {
     flex: 1; /* Das Bild nimmt den restlichen Platz ein */
+    flex: 1;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -62,6 +65,8 @@
   .image-content img {
     max-width: 100%; /* Das Bild passt sich dem verfügbaren Platz an */
     max-height: 100vh; /* Das Bild überschreitet nicht die Bildschirmhöhe */
+    max-width: 100%;
+    max-height: 100vh;
   }
 
   @media (max-width: 1000px) {
@@ -73,6 +78,25 @@
     }
     .text-content {
       width: 100%;
+    }
+    .page-content {
+      padding: 20px;
+    }
+  }
+
+  @media (max-width: 600px) {
+    .landing-container {
+      padding: 1rem;
+    }
+  
+    h1 {
+      font-size: 1.8rem;
+    }
+    
+    button {
+      width: 100%;
+      max-width: 280px;
+      margin: 0.5rem auto;
     }
   }
 </style>

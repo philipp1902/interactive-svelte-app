@@ -327,11 +327,12 @@
 
   function drawCard() {
     if (canDraw && deck.length > 0) {
-      const drawnCard = deck.pop();
-      const drawPile = document.querySelector(".draw-card-button");
-      const playerHand = document.querySelector(".list-container");
-      animateCardToHand(drawPile, playerHand, () => {
-            playerCards = [...playerCards, drawnCard];
+        const drawnCard = deck.pop();
+        const drawPile = document.querySelector(".draw-card-button");
+        const playerHand = document.querySelector(".list-container");
+
+        animateCardToHand(drawPile, playerHand, () => {
+            playerCards = [...playerCards, drawnCard];  // Füge die Karte erst nach der Animation hinzu
             canDraw = false;
             message = "Du kannst nur einmal pro Runde ziehen.";
             gameStore.set({
@@ -347,58 +348,47 @@
                 hoveredCard,
             });
         });
-      
-      playerCards = [...playerCards, drawnCard];
-      canDraw = false;
-      message = "Du kannst nur einmal pro Runde ziehen.";
-      gameStore.set({
-        playerCards,
-        aiCards,
-        deck,
-        discardPile,
-        lastCard,
-        canDraw,
-        message,
-        gameOver,
-        aiResponse,
-        hoveredCard,
-      });
+
     } else if (deck.length === 0) {
-      deck = shuffleDeck(discardPile.slice(0, -1));
-      discardPile = [discardPile[discardPile.length - 1]];
-      const drawnCard = deck.pop();
-      playerCards = [...playerCards, drawnCard];
-      canDraw = false;
-      message = "Du kannst nur einmal pro Runde ziehen.";
-      gameStore.set({
-        playerCards,
-        aiCards,
-        deck,
-        discardPile,
-        lastCard,
-        canDraw,
-        message,
-        gameOver,
-        aiResponse,
-        hoveredCard,
-      });
+        deck = shuffleDeck(discardPile.slice(0, -1));
+        discardPile = [discardPile[discardPile.length - 1]];
+        const drawnCard = deck.pop();
+        animateCardToHand(drawPile, playerHand, () => {
+            playerCards = [...playerCards, drawnCard];  
+            canDraw = false;
+            message = "Du kannst nur einmal pro Runde ziehen.";
+            gameStore.set({
+                playerCards,
+                aiCards,
+                deck,
+                discardPile,
+                lastCard,
+                canDraw,
+                message,
+                gameOver,
+                aiResponse,
+                hoveredCard,
+            });
+        });
+
     } else {
-      message = "Du kannst nur einmal pro Runde ziehen.";
-      gameStore.set({
-        playerCards,
-        aiCards,
-        deck,
-        discardPile,
-        lastCard,
-        canDraw,
-        message,
-        gameOver,
-        aiResponse,
-        hoveredCard,
-      });
+        message = "Du kannst nur einmal pro Runde ziehen.";
+        gameStore.set({
+            playerCards,
+            aiCards,
+            deck,
+            discardPile,
+            lastCard,
+            canDraw,
+            message,
+            gameOver,
+            aiResponse,
+            hoveredCard,
+        });
     }
     checkGameOver();
-  }
+}
+
 
   function drawCardForAI(count) {
     for (let i = 0; i < count; i++) {
@@ -778,8 +768,11 @@
   });
 
   function animateCardToHand(from, to, callback) {
+    console.log("Animation gestartet", from, to);
+    
     const clone = document.createElement('div');
     clone.className = 'card animated';
+    clone.style.backgroundImage = "url('images/ruckseite.png')";
     
     const fromRect = from.getBoundingClientRect();
     const toRect = to.getBoundingClientRect();
@@ -789,20 +782,27 @@
     clone.style.left = `${fromRect.left}px`;
     clone.style.width = `${fromRect.width}px`;
     clone.style.height = `${fromRect.height}px`;
-    clone.style.transition = 'all 0.5s ease-in-out';
+    clone.style.transition = 'transform 0.5s ease-in-out';
     clone.style.zIndex = '1000';
     
     document.body.appendChild(clone);
-    
+
     requestAnimationFrame(() => {
-        clone.style.transform = `translate(${toRect.left - fromRect.left}px, ${toRect.top - fromRect.top}px)`;
+        setTimeout(() => {
+          clone.style.transform = `translate(${toRect.left - fromRect.left}px, ${toRect.bottom - fromRect.bottom}px)`;
+        }, 1);
     });
-    
-    clone.addEventListener('transitionend', () => {
-        clone.remove();
-        if (callback) callback();
+
+    clone.addEventListener('transitionend', (event) => {
+        if (event.target === clone && event.propertyName === 'transform') {
+            console.log("Animation beendet für:", clone);
+            clone.remove();
+            if (callback) callback();
+        }
     });
 }
+
+
 </script>
 
 <header>
