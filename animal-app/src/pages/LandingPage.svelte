@@ -15,7 +15,7 @@
 <main>
   <div class="content-container">
     <div class="text-content">
-      <h1>Willkommen in der wilden Welt von Miau Miau</h1> <br>
+      <h1>Willkommen in der wilden Welt von PAW!</h1> <br>
       <p>Entdecke wilde Tiere, lerne spannende Fakten und erlebe tierischen Spielspaß – das Kartenspiel, das Wissen und Action verbindet!</p>
       <button>
         <a href="#/game" style="text-decoration: none; color: inherit;">Jetzt spielen</a>

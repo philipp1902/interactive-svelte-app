@@ -7,6 +7,7 @@
   import SkipCard from "../components/SkipCard.svelte";
   import ColorChoiceCard from "../components/ColorChoiceCard.svelte";
   import { animalImages } from "../animalImages.js";
+  import { animalImagesColored } from "../animalImagescolored.js";
 
   const config = {
     apiKey: import.meta.env.VITE_OPENAI_API_KEY,
@@ -33,7 +34,8 @@
   let showTooltip = false;
   const colors = ["rot", "gelb", "grün", "blau"];
   const numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9];
-  const specialCards = ["Zieh 2", "Aussetzen", "Farbwahl", "Tauschen"];
+  const specialCards = ["Farbwahl", "Tauschen"];
+
 
   const habitats = {
     rot: "Savanne",
@@ -129,23 +131,31 @@
         aiResponse,
         hoveredCard,
       });
+      if (playableCards.length > 0) {
+        const aiCard = playableCards[Math.floor(Math.random() * playableCards.length)];
+        const aiHand = document.querySelector("ul.list-container");
+        const discardPile = document.querySelector(".discard-draw-container");
+        
+        animateCardToDiscard(aiCard, () => {
+            aiCards = aiCards.filter((card) => card !== aiCard);
+            discardPile.push(aiCard);
+            lastCard = aiCard;
+            // ... rest of the AI logic
+        });
+    }
       return;
     }
 
     const playableCards = aiCards.filter(
-      (card) =>
-        (card.color === lastCard.color && card.type !== "Farbwahl") ||
-        card.number === lastCard.number ||
-        (specialCards.includes(card.type) && card.type === lastCard.type) ||
-        (card.type === "Aussetzen" &&
-          (card.color === lastCard.color || lastCard.type === "Aussetzen")) || // iwie legt es das trotzdem auf die karte wo es bock hat
-        (card.type === "Zieh 2" &&
-          (card.color === lastCard.color || lastCard.type === "Zieh 2")) ||
-        (card.type === "Tauschen" &&
-          (card.color === lastCard.color || lastCard.type === "Tauschen")) ||
-        card.type === "Farbwahl"
-    );
-
+  (card) =>
+    (card.color === lastCard.color && card.type !== "Farbwahl") ||
+    card.number === lastCard.number ||
+    (specialCards.includes(card.type) && card.type === lastCard.type) ||
+    (card.type === "Aussetzen" && card.color === lastCard.color) ||
+    (card.type === "Zieh 2" && card.color === lastCard.color) ||
+    (card.type === "Tauschen" && card.color === lastCard.color) ||
+    card.type === "Farbwahl"
+);
     if (playableCards.length > 0) {
       const aiCard =
         playableCards[Math.floor(Math.random() * playableCards.length)];
@@ -199,28 +209,19 @@
   }
 
   async function generateTooltipText(card) {
-    if (!card || !card.number) return;
-    try {
-      const prompt = `Gib mir 3 sehr kurze Fakten über das Tier ${card.animal}. Maximal 10 Wörter pro Fakt. Als eine unordered list.`;
-      // const prompt = `Gib mir einen kurzen Satz über die Nummer ${card.number}.`;
-      const response = await openai.chat.completions.create({
-        model: "gpt-4o-mini",
-        messages: [{ role: "user", content: prompt }],
-      });
-      tooltipText = response.choices[0].message.content;
-
-      // const imagePrompt = `Erstelle ein realistisches und farbenfrohes Bild von einem Känguru mit einem leicht stilisierten Touch`;
-      // const imageResponse = await openai.images.generate({
-      //   prompt: imagePrompt,
-      //   n: 1,
-      //   size: "256x256",
-      // });
-      // koalaImageUrl = imageResponse.data[0].url;
-    } catch (error) {
-      console.error("Error generating tooltip text:", error);
-      tooltipText = "Error generating tooltip text.";
-    }
+  if (!card || !card.number) return;
+  try {
+    const prompt = `Gib mir 3 sehr kurze Fakten über das Tier ${card.animal}. Maximal 10 Wörter pro Fakt. Als eine unordered list.`;
+    const response = await openai.chat.completions.create({
+      model: "gpt-3.5-turbo", // or "gpt-4"
+      messages: [{ role: "user", content: prompt }],
+    });
+    tooltipText = response.choices[0].message.content;
+  } catch (error) {
+    console.error("Error generating tooltip text:", error);
+    tooltipText = "Error generating tooltip text.";
   }
+}
 
   //   async function loadCardImages() {
   //   for (let card of playerCards) {
@@ -327,6 +328,26 @@
   function drawCard() {
     if (canDraw && deck.length > 0) {
       const drawnCard = deck.pop();
+      const drawPile = document.querySelector(".draw-card-button");
+      const playerHand = document.querySelector(".list-container");
+      animateCardToHand(drawPile, playerHand, () => {
+            playerCards = [...playerCards, drawnCard];
+            canDraw = false;
+            message = "Du kannst nur einmal pro Runde ziehen.";
+            gameStore.set({
+                playerCards,
+                aiCards,
+                deck,
+                discardPile,
+                lastCard,
+                canDraw,
+                message,
+                gameOver,
+                aiResponse,
+                hoveredCard,
+            });
+        });
+      
       playerCards = [...playerCards, drawnCard];
       canDraw = false;
       message = "Du kannst nur einmal pro Runde ziehen.";
@@ -728,6 +749,11 @@
     console.log(`Background image for ${animal}: ${imageUrl}`);
     return imageUrl;
   }
+  function getBackgroundImageColored(animal) {
+    const imageUrl = animalImagesColored[animal] || "default_image.jpg";
+    console.log(`Background image for ${animal}: ${imageUrl}`);
+    return imageUrl;
+  }
   function getHabitatClass(habitat) {
     return habitat.toLowerCase();
   }
@@ -750,10 +776,37 @@
   onMount(() => {
     dealCards();
   });
+
+  function animateCardToHand(from, to, callback) {
+    const clone = document.createElement('div');
+    clone.className = 'card animated';
+    
+    const fromRect = from.getBoundingClientRect();
+    const toRect = to.getBoundingClientRect();
+    
+    clone.style.position = 'fixed';
+    clone.style.top = `${fromRect.top}px`;
+    clone.style.left = `${fromRect.left}px`;
+    clone.style.width = `${fromRect.width}px`;
+    clone.style.height = `${fromRect.height}px`;
+    clone.style.transition = 'all 0.5s ease-in-out';
+    clone.style.zIndex = '1000';
+    
+    document.body.appendChild(clone);
+    
+    requestAnimationFrame(() => {
+        clone.style.transform = `translate(${toRect.left - fromRect.left}px, ${toRect.top - fromRect.top}px)`;
+    });
+    
+    clone.addEventListener('transitionend', () => {
+        clone.remove();
+        if (callback) callback();
+    });
+}
 </script>
 
 <header>
-  <h1>Miau Miau</h1>
+  <h1>PAW</h1>
   <p>Du willst wissen, wie das Spiel funktioniert?<a href="#/explanation" style="text-decoration: underline;">Finde es hier raus!</a></p>
   <nav>
     <a href="#/">Home</a>
@@ -768,25 +821,8 @@
       {#each aiCards as card}
         <button
           class={`card ${card.type ? "special " + card.type.toLowerCase().replace(" ", "-") : ""} ${getHabitatClass(card.habitat)}`}
-          style="background-color: {card.color}; background-image: url('{getBackgroundImage(
-            card.animal
-          )}');"
-          on:mouseover={() => {
-            if (hoveredCard != card) hoveredCard = card;
-          }}
-          on:mouseout={() => (hoveredCard = null)}
-          on:focus={() => {
-            if (hoveredCard != card) hoveredCard = card;
-          }}
-          on:blur={() => (hoveredCard = null)}
+          style="background-image: url('images/ruckseite.png');border: none;pointer-events: none;"
         >
-          {#if card.type}
-            {card.type}
-          {:else}
-            <span class="number {getHabitatClass(card.habitat)}"
-              >{card.number}</span
-            >
-          {/if}
         </button>
       {/each}
     </ul>
@@ -795,13 +831,13 @@
   <div>
     <button on:click={aiPlayTurn} disabled={gameOver}>KI Spielzug</button>
   </div>
-  <div>
+  <!-- <div>
     <h2>KI Antwort:</h2>
     <p>{aiResponse}</p>
-  </div>
+  </div> -->
   <div class="discard-draw-container">
     <div>
-      <h2>Ablagestapel:</h2>
+      <!-- <h2>Ablagestapel:</h2> -->
       <ul>
         {#if lastCard}
           <li
@@ -832,7 +868,7 @@
       </ul>
     </div>
     <div>
-      <h2>Karte ziehen:</h2>
+      <!-- <h2>Karte ziehen:</h2> -->
       <DrawCardButton onDraw={drawCard} />
     </div>
   </div>
@@ -906,24 +942,28 @@
     </div>
   {/if}
 
-  {#if hoveredCard || showTooltip}
+  {#if hoveredCard && !hoveredCard.type}
     <div
       class="tooltip"
       role="tooltip"
       style="
       position: fixed;
-      left: {mouseX + 15}px; 
-      top: {mouseY - 185}px;
-    "
+      left: 200px; 
+      top: 500px;"
     >
+    <img 
+  src="{getBackgroundImageColored(hoveredCard.animal)}" 
+  alt="{hoveredCard.animal}" 
+  style="width: 100%; display: block; margin-bottom: 10px; object-fit: fill; border-radius: 5px;"
+  />
       {#if hoveredCard.type}
-        <p>Typ: {hoveredCard.type}</p>
+        <!-- <p>Typ: {hoveredCard.type}</p> -->
       {:else}
-        <p>Farbe: {hoveredCard.color}</p>
-        <p>Zahl: {hoveredCard.number}</p>
+        <!-- <p>Farbe: {hoveredCard.color}</p>
+        <p>Zahl: {hoveredCard.number}</p> -->
       {/if}
-      <p>Lebensraum: {hoveredCard.habitat}</p>
-      <p>Tier: {hoveredCard.animal}</p>
+      <h2>{hoveredCard.animal}</h2>
+      <p>{hoveredCard.habitat}</p>
       <p>{tooltipText}</p>
     </div>
   {/if}
@@ -943,5 +983,15 @@
 
   .list-container {
     overflow: visible !important;
+    display:flex;
+    justify-content: center;
   }
+  .animated {
+    transition: all 0.5s ease-in-out;
+    pointer-events: none;
+}
+
+.card {
+    transform-origin: center center;
+}
 </style>
