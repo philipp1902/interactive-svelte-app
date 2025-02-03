@@ -12,7 +12,10 @@
   }
 </script>
 
-<main>
+<div class="landing-container">
+  <div class="content-container">
+    <img src="/images/logo-colored.png" alt="Colored Logo" />
+  </div>
   <div class="content-container">
     <div class="text-content">
       <h1>Willkommen in der wilden Welt von PAW!</h1> <br>
@@ -27,44 +30,40 @@
       <img src="/images/card-test.png" alt="Ein thematisches Bild" />
     </div>
   </div>
-</main>
+</div>
 
 <style>
-  main {padding: 20px;}
   :global(body) {
-    background-image: url('/images/Frontpage.png');
+    /* background-image: url('/images/Frontpage.png');
     background-size: cover;
-    background-position: center;
+    background-position: center; */
     margin: 0;
     height: 100vh;
     width: 100vw;
   }
 
-  main {
-    padding: 20px;
-  }
+  .landing-container {
+      padding: 20px;
+    }
   .content-container {
     display: flex;
-    gap: 20px; /* Abstand zwischen Text und Bild */
-    max-width: 100%; /* Maximale Breite des Containers */
     gap: 20px;
     max-width: 100%;
     align-items: center;
-  }
+    }
+  
   .text-content {
     width: 50%;
-  }
+    }
+    
   .image-content {
-    flex: 1; /* Das Bild nimmt den restlichen Platz ein */
     flex: 1;
     display: flex;
     justify-content: center;
     align-items: center;
-  }
+    }
 
   .image-content img {
-    max-width: 100%; /* Das Bild passt sich dem verfügbaren Platz an */
-    max-height: 100vh; /* Das Bild überschreitet nicht die Bildschirmhöhe */
     max-width: 100%;
     max-height: 100vh;
   }

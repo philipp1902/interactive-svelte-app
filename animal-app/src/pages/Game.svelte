@@ -806,6 +806,9 @@
 </script>
 
 <header>
+  <div class="content-container">
+    <img src="/images/logo-colored.png" alt="Colored Logo" />
+  </div>
   <h1>PAW</h1>
   <p>Du willst wissen, wie das Spiel funktioniert?<a href="#/explanation" style="text-decoration: underline;">Finde es hier raus!</a></p>
   <nav>
@@ -842,9 +845,7 @@
         {#if lastCard}
           <li
             class={`card ${lastCard.type ? "special " + lastCard.type.toLowerCase().replace(" ", "-") : ""} ${getHabitatClass(lastCard.habitat)}`}
-            style="background-color: {lastCard.color}; background-image: url('{getBackgroundImage(
-              lastCard.animal
-            )}');"
+            style="background-color: {lastCard.color}; background-image: url('{getBackgroundImage(lastCard.animal)}'); position: relative;" 
             on:mouseover={() => {
               hoveredCard = lastCard;
               generateTooltipText(lastCard);
@@ -856,17 +857,38 @@
             }}
             on:blur={() => (hoveredCard = null)}
           >
+            <!-- Card Content: Type or Number -->
             {#if lastCard.type}
               {lastCard.type}
             {:else}
-              <span class="number {getHabitatClass(lastCard.habitat)}"
-                >{lastCard.number}</span
-              >
+              <span class="number {getHabitatClass(lastCard.habitat)}" style="position: absolute; top: -5px; left: 5px;">
+                {lastCard.number}</span>
+                <span class="number {getHabitatClass(lastCard.habitat)}" style="position: absolute; bottom: -5px; right: 5px;">
+                  {lastCard.number}</span>
+            {/if}
+    
+            <!-- Habitat-Specific Icons -->
+            {#if lastCard.habitat === 'Regenwald'}
+              <img src="/images/regenwald.png" alt="Regenwald Icon" style="position: absolute; top: 5px; right: 5px; width: 50%; z-index: 10;" />
+              <img src="/images/regenwald.png" alt="Regenwald Icon" style="position: absolute; bottom: 5px; left: 5px; width: 50%; z-index: 10;" />
+            {/if}
+            {#if lastCard.habitat === 'Ozean'}
+              <img src="/images/ozean.png" alt="Ozean Icon" style="position: absolute; top: 5px; right: 5px; width: 50%; z-index: 10;" />
+              <img src="/images/ozean.png" alt="Ozean Icon" style="position: absolute; bottom: 5px; left: 5px; width: 50%; z-index: 10;" />
+            {/if}
+            {#if lastCard.habitat === 'Wüste'}
+              <img src="/images/Wuste.png" alt="Wüste Icon" style="position: absolute; top: 5px; right: 5px; width: 50%; z-index: 10;" />
+              <img src="/images/Wuste.png" alt="Wüste Icon" style="position: absolute; bottom: 5px; left: 5px; width: 50%; z-index: 10;" />
+            {/if}
+            {#if lastCard.habitat === 'Savanne'}
+              <img src="/images/savanne.png" alt="Savanne Icon" style="position: absolute; top: 5px; right: 5px; width: 50%; z-index: 10;" />
+              <img src="/images/savanne.png" alt="Savanne Icon" style="position: absolute; bottom: 5px; left: 5px; width: 50%; z-index: 10;" />
             {/if}
           </li>
         {/if}
       </ul>
     </div>
+    
     <div>
       <!-- <h2>Karte ziehen:</h2> -->
       <DrawCardButton onDraw={drawCard} />
@@ -880,7 +902,7 @@
           class={`card ${card.type ? "special " + card.type.toLowerCase().replace(" ", "-") : ""} ${getHabitatClass(card.habitat)}`}
           style="background-color: {card.color}; background-image: url('{getBackgroundImage(
             card.animal
-          )}');"
+          )}');position: relative; padding: 5px;"
           data-card-id={card.id}
           on:mouseover={() => {
             hoveredCard = card;
@@ -902,9 +924,28 @@
           {#if card.type}
             {card.type}
           {:else}
-            <span class="number {getHabitatClass(card.habitat)}"
+            <span class="number {getHabitatClass(card.habitat)}" style="position: absolute; top: -5px; left: 5px;"
               >{card.number}</span
             >
+            <span class="number {getHabitatClass(card.habitat)}" style="position: absolute; bottom: -5px; right: 5px;"
+              >{card.number}</span
+            >
+            {#if card.habitat === 'Regenwald'}
+              <img src="/images/regenwald.png" alt="Regenwald Icon" style="position: absolute; top: 5px; right: 5px; width: 50%;" />
+              <img src="/images/regenwald.png" alt="Regenwald Icon" style="position: absolute; bottom: 5px; left: 5px; width: 50%;" />
+            {/if}
+            {#if card.habitat === 'Ozean'}
+              <img src="/images/ozean.png" alt="Ozean Icon" style="position: absolute; top: 5px; right: 5px; width: 50%;" />
+              <img src="/images/ozean.png" alt="Ozean Icon" style="position: absolute; bottom: 5px; left: 5px; width: 50%;" />
+            {/if}
+            {#if card.habitat === 'Wüste'}
+              <img src="/images/Wuste.png" alt="Wüste Icon" style="position: absolute; top: 5px; right: 5px; width: 40%;" />
+              <img src="/images/Wuste.png" alt="Wüste Icon" style="position: absolute; bottom: 5px; left: 5px; width: 40%;" />
+            {/if}
+            {#if card.habitat === 'Savanne'}
+              <img src="/images/savanne.png" alt="Savanne Icon" style="position: absolute; top: 5px; right: 5px; width: 50%;" />
+              <img src="/images/savanne.png" alt="Savanne  Icon" style="position: absolute; bottom: 5px; left: 5px; width: 50%;" />
+            {/if}
           {/if}
         </button>
       {/each}

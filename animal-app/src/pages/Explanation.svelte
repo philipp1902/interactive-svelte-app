@@ -1,5 +1,8 @@
   <main>
     <div class="content-container">
+      <img src="/images/logo-colored.png" alt="Colored Logo" />
+    </div>
+    <div class="content-container">
       <div class="text-content">
         <h1>Spielbeschreibung</h1> <br>
         <h2>Spielprinzip und Ablauf</h2>
@@ -17,9 +20,9 @@
         <p>Neben den Zahlenkarten von 1 bis 9 sorgen diese Spezialkarten für aufregende Wendungen im Spiel:</p>
         <ul>
           <li>Tauschkarte - Tausche eine zufällige Karte mit deinem Gegner.</li>
-          <li>Skip-Karte  – Überspringe die Runde deines Gegners und spiele erneut.</li> 
+          <!-- <li>Skip-Karte  – Überspringe die Runde deines Gegners und spiele erneut.</li>  -->
           <li>Farbwahl-Karte  – Wähle einen Lebensraum, den der nächste Spieler bedienen muss.</li>
-          <li>Zieh-2-Karte  – Dein Gegner muss zwei zusätzliche Karten ziehen.</li>
+          <!-- <li>Zieh-2-Karte  – Dein Gegner muss zwei zusätzliche Karten ziehen.</li> -->
         </ul>  
         <br>
         <!-- <button>
@@ -45,9 +48,10 @@
   <style>
     main {padding: 20px;}
     :global(body) {
-      background-image: url('/images/Frontpage.png');
+      /* background-image: url('/images/Frontpage.png');
       background-size: cover;
-      background-position: center;
+      background-position: center; */
+      background-color: rgb(15, 15, 15);
       margin: 0;
       height: 100vh;
       width: 100vw;
