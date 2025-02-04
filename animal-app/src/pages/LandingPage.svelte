@@ -27,7 +27,7 @@
       <p>Du willst wissen, wie das Spiel funktioniert?<a href="#/explanation" style="text-decoration: underline;">Finde es hier raus!</a></p>
     </div>
     <div class="image-content">
-      <img src="/images/card-test.png" alt="Ein thematisches Bild" />
+      <img src="/images/startingscreen.png" alt="Ein thematisches Bild" />
     </div>
   </div>
 </div>

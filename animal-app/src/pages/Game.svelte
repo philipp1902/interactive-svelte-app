@@ -819,7 +819,7 @@
 </header>
 <main>
   <div>
-    <h2>KI Karten:</h2>
+    <!-- <h2>KI Karten:</h2> -->
     <ul class="list-container">
       {#each aiCards as card}
         <button
@@ -857,10 +857,19 @@
             }}
             on:blur={() => (hoveredCard = null)}
           >
+          
             <!-- Card Content: Type or Number -->
             {#if lastCard.type}
-              {lastCard.type}
+            {#if lastCard.type === "Farbwahl" || lastCard.type === "Tauschen"}
+              <img 
+                src={lastCard.type === "Farbwahl" ? "/images/farbwahl.png" : "/images/tauschen.png"} 
+                alt="{lastCard.type} Icon" 
+                style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 80%; z-index: 1000;" 
+              />
             {:else}
+              {lastCard.type}
+            {/if}
+          {:else}
               <span class="number {getHabitatClass(lastCard.habitat)}" style="position: absolute; top: -5px; left: 5px;">
                 {lastCard.number}</span>
                 <span class="number {getHabitatClass(lastCard.habitat)}" style="position: absolute; bottom: -5px; right: 5px;">
@@ -869,33 +878,32 @@
     
             <!-- Habitat-Specific Icons -->
             {#if lastCard.habitat === 'Regenwald'}
-              <img src="/images/regenwald.png" alt="Regenwald Icon" style="position: absolute; top: 5px; right: 5px; width: 50%; z-index: 10;" />
-              <img src="/images/regenwald.png" alt="Regenwald Icon" style="position: absolute; bottom: 5px; left: 5px; width: 50%; z-index: 10;" />
+              <img src="/images/regenwald.png" alt="Regenwald Icon" style="position: absolute; top: 5px; right: 5px; width: 25%; z-index: 10;" />
+              <img src="/images/regenwald.png" alt="Regenwald Icon" style="position: absolute; bottom: 5px; left: 5px; width: 25%; z-index: 10;" />
             {/if}
             {#if lastCard.habitat === 'Ozean'}
-              <img src="/images/ozean.png" alt="Ozean Icon" style="position: absolute; top: 5px; right: 5px; width: 50%; z-index: 10;" />
-              <img src="/images/ozean.png" alt="Ozean Icon" style="position: absolute; bottom: 5px; left: 5px; width: 50%; z-index: 10;" />
+              <img src="/images/ozean.png" alt="Ozean Icon" style="position: absolute; top: 5px; right: 5px; width: 25%; z-index: 10;" />
+              <img src="/images/ozean.png" alt="Ozean Icon" style="position: absolute; bottom: 5px; left: 5px; width: 25%; z-index: 10;" />
             {/if}
             {#if lastCard.habitat === 'Wüste'}
-              <img src="/images/Wuste.png" alt="Wüste Icon" style="position: absolute; top: 5px; right: 5px; width: 50%; z-index: 10;" />
-              <img src="/images/Wuste.png" alt="Wüste Icon" style="position: absolute; bottom: 5px; left: 5px; width: 50%; z-index: 10;" />
+              <img src="/images/Wuste.png" alt="Wüste Icon" style="position: absolute; top: 5px; right: 5px; width: 20%; z-index: 10;" />
+              <img src="/images/Wuste.png" alt="Wüste Icon" style="position: absolute; bottom: 5px; left: 5px; width: 20%; z-index: 10;" />
             {/if}
             {#if lastCard.habitat === 'Savanne'}
-              <img src="/images/savanne.png" alt="Savanne Icon" style="position: absolute; top: 5px; right: 5px; width: 50%; z-index: 10;" />
-              <img src="/images/savanne.png" alt="Savanne Icon" style="position: absolute; bottom: 5px; left: 5px; width: 50%; z-index: 10;" />
+              <img src="/images/savanne.png" alt="Savanne Icon" style="position: absolute; top: 5px; right: 5px; width: 25%; z-index: 10;" />
+              <img src="/images/savanne.png" alt="Savanne Icon" style="position: absolute; bottom: 5px; left: 5px; width: 25%; z-index: 10;" />
             {/if}
           </li>
         {/if}
       </ul>
     </div>
-    
     <div>
       <!-- <h2>Karte ziehen:</h2> -->
       <DrawCardButton onDraw={drawCard} />
     </div>
   </div>
   <div>
-    <h2>Deine Karten:</h2>
+    <!-- <h2>Deine Karten:</h2> -->
     <ul class="list-container">
       {#each playerCards as card, index}
         <button
@@ -941,20 +949,20 @@
               >{card.number}</span
             >
             {#if card.habitat === 'Regenwald'}
-              <img src="/images/regenwald.png" alt="Regenwald Icon" style="position: absolute; top: 5px; right: 5px; width: 50%;" />
-              <img src="/images/regenwald.png" alt="Regenwald Icon" style="position: absolute; bottom: 5px; left: 5px; width: 50%;" />
+              <img src="/images/regenwald.png" alt="Regenwald Icon" style="position: absolute; top: 5px; right: 5px; width: 25%;" />
+              <img src="/images/regenwald.png" alt="Regenwald Icon" style="position: absolute; bottom: 5px; left: 5px; width: 25%;" />
             {/if}
             {#if card.habitat === 'Ozean'}
-              <img src="/images/ozean.png" alt="Ozean Icon" style="position: absolute; top: 5px; right: 5px; width: 50%;" />
-              <img src="/images/ozean.png" alt="Ozean Icon" style="position: absolute; bottom: 5px; left: 5px; width: 50%;" />
+              <img src="/images/ozean.png" alt="Ozean Icon" style="position: absolute; top: 5px; right: 5px; width: 25%;" />
+              <img src="/images/ozean.png" alt="Ozean Icon" style="position: absolute; bottom: 5px; left: 5px; width: 25%;" />
             {/if}
             {#if card.habitat === 'Wüste'}
-              <img src="/images/Wuste.png" alt="Wüste Icon" style="position: absolute; top: 5px; right: 5px; width: 40%;" />
-              <img src="/images/Wuste.png" alt="Wüste Icon" style="position: absolute; bottom: 5px; left: 5px; width: 40%;" />
+              <img src="/images/Wuste.png" alt="Wüste Icon" style="position: absolute; top: 5px; right: 5px; width: 20%;" />
+              <img src="/images/Wuste.png" alt="Wüste Icon" style="position: absolute; bottom: 5px; left: 5px; width: 20%;" />
             {/if}
             {#if card.habitat === 'Savanne'}
-              <img src="/images/savanne.png" alt="Savanne Icon" style="position: absolute; top: 5px; right: 5px; width: 50%;" />
-              <img src="/images/savanne.png" alt="Savanne  Icon" style="position: absolute; bottom: 5px; left: 5px; width: 50%;" />
+              <img src="/images/savanne.png" alt="Savanne Icon" style="position: absolute; top: 5px; right: 5px; width: 25%;" />
+              <img src="/images/savanne.png" alt="Savanne  Icon" style="position: absolute; bottom: 5px; left: 5px; width: 25%;" />
             {/if}
             <!-- {#if card.type === "Farbwahl"}
             <img src="/images/tauschen.png" alt="Farbwahl Icon" style="position: absolute; top: 5px; right: 5px; width: 50%; z-index: 100o;" />

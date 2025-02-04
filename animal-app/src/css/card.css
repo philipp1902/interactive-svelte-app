@@ -14,8 +14,8 @@
   background-position: center; /* Center the background image */
   background-repeat: no-repeat; /* Prevent the background image from repeating */
   cursor: pointer;
-  width: 100px;
-  height: 150px;
+  width: calc(100vh * 0.13);
+  height: calc(100vh * 0.2);
   color: black;    
   font-size: 48px;
   text-align: center;
@@ -68,6 +68,7 @@
     }
   }
 
+  
   .discard-draw-container {
     display: flex;
     justify-content: center;
