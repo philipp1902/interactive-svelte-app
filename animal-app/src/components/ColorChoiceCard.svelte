@@ -41,7 +41,7 @@
           <button
             on:click={() => selectColor(color)}
             class={color}
-            style="background-color: {myColors[color]} !important;"
+            style="background-color: {myColors[color]} !important; "
           >
             {habitats[color]}
           </button>
@@ -51,6 +51,7 @@
   </div>
   
   <style>
+    
     .color-choice-menu .savanne {
       background-color: #f7562c; /* Color for Savanne */ /* Farben in ColorChoice funktionieren noch nicht */
     }
@@ -66,6 +67,7 @@
     .color-choice-menu .regenwald {
       background-color: #037a54; /* Color for Regenwald */
     }
+       
     /* .color-choice-menu {
           display: flex;
           justify-content: center;

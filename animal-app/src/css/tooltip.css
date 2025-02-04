@@ -1,7 +1,6 @@
 .tooltip {
   position: absolute;
-  top: 40%;
-  left: 80%;
+  
   transform: translate(-50%, -50%);
   background-color: #23222287;
   padding: 24px;
@@ -9,7 +8,7 @@
   text-align: left;
   font-size: 16px;
   z-index: 1000;
-  width: 40%;
+  width: 30%;
 }
 
 /* .tooltip img {

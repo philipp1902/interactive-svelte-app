@@ -213,7 +213,7 @@
   try {
     const prompt = `Gib mir 3 sehr kurze Fakten über das Tier ${card.animal}. Maximal 10 Wörter pro Fakt. Als eine unordered list.`;
     const response = await openai.chat.completions.create({
-      model: "gpt-3.5-turbo", // or "gpt-4"
+      model: "gpt-4", // or "gpt-4"
       messages: [{ role: "user", content: prompt }],
     });
     tooltipText = response.choices[0].message.content;
@@ -921,8 +921,18 @@
             }
           }}
         >
-          {#if card.type}
-            {card.type}
+        {#if card.type}
+  {#if card.type === "Farbwahl" || card.type === "Tauschen"}
+    <img 
+      src={card.type === "Farbwahl" ? "/images/farbwahl.png" : "/images/tauschen.png"} 
+      alt="{card.type} Icon" 
+      style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 80%; z-index: 1000;" 
+    />
+  {:else}
+    {card.type}
+  {/if}
+      
+
           {:else}
             <span class="number {getHabitatClass(card.habitat)}" style="position: absolute; top: -5px; left: 5px;"
               >{card.number}</span
@@ -946,6 +956,10 @@
               <img src="/images/savanne.png" alt="Savanne Icon" style="position: absolute; top: 5px; right: 5px; width: 50%;" />
               <img src="/images/savanne.png" alt="Savanne  Icon" style="position: absolute; bottom: 5px; left: 5px; width: 50%;" />
             {/if}
+            <!-- {#if card.type === "Farbwahl"}
+            <img src="/images/tauschen.png" alt="Farbwahl Icon" style="position: absolute; top: 5px; right: 5px; width: 50%; z-index: 100o;" />
+            <img src="/images/tauschen.png" alt="Farbwahl Icon"/>
+          {/if} -->
           {/if}
         </button>
       {/each}
@@ -989,7 +1003,7 @@
       role="tooltip"
       style="
       position: fixed;
-      left: 200px; 
+      left: 20%; 
       top: 500px;"
     >
     <img 
