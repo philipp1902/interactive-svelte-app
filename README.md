@@ -4,10 +4,7 @@ PAW ist ein interaktives Kartenspiel, das im Rahmen des Semesterprojekts im Kurs
 
 ## Spielregeln 🚨
 
-- **Kartenausgabe:** Jeder Spieler erhält zu Beginn 7 Karten.
-- **Ablegen:** Beim Ablegen muss die Karte entweder die gleiche Farbe oder die gleiche Zahl wie die vorherige Karte haben.
-- **Sonderkarten:** Sonderkarten bringen zusätzliche Spannung ins Spiel, indem sie das Geschehen beeinflussen.
-- **Ziel:** Der Spieler, der als Erster alle seine Karten ablegt, gewinnt die Runde.
+Jeder Spieler erhält zu Beginn 7 Karten. Beim Ablegen muss die Karte entweder die gleiche Farbe oder die gleiche Zahl wie die vorherige Karte haben. Sonderkarten bringen zusätzliche Spannung ins Spiel, indem sie das Geschehen beeinflussen. Der Spieler, der als Erster alle seine Karten ablegt, gewinnt die Runde.
 
 ## Projektarchitektur & Technischer Stack 🗄
 
