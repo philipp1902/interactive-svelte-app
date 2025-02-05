@@ -79,12 +79,12 @@ p {
 }
 
 button {
-  background: white;
-  border: white 2px solid;
+  background: #f7eedf;
+  border: #f7eedf 2px solid;
   border-radius: 5px;
-  color: black;
+  color: #1c1a1b;
   cursor: pointer;
-  font-size: 1rem;
+  font-size: 1.1rem;
   padding: 16px 48px;
   transition: background 0.3s ease;
   /* margin-bottom: 16px; */
@@ -99,13 +99,13 @@ button:hover {
   background: none;
 font-weight: bolder;
 transform: scale(1.05);
-  border: white 2px solid;
-  color: white;
+  border: #f7eedf 2px solid;
+  color: #f7eedf;
   transition: background 0.7s ease;
 }
 
 a {
-  font-size: 1.2rem;
+  font-size: 1.1rem;
   margin-bottom: 20px;
   color: #f7eedf;
   text-align: left;
