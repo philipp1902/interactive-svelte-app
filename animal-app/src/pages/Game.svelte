@@ -122,7 +122,8 @@
     }
   }
 
-  function aiPlayTurn() {                                     //KI Spielzug, was kann sie legen, wann kann sie legen, wann kann sie ziehen
+  function aiPlayTurn() {
+    //KI Spielzug, was kann sie legen, wann kann sie legen, wann kann sie ziehen
     const playableCards = aiCards.filter(
       (card) =>
         (card.color === lastCard.color && card.type !== "Farbwahl") ||
@@ -131,7 +132,7 @@
         (card.type === "Aussetzen" && card.color === lastCard.color) ||
         (card.type === "Zieh 2" && card.color === lastCard.color) ||
         (card.type === "Tauschen" && card.color === lastCard.color) ||
-        card.type === "Farbwahl"
+        card.type === "Farbwahl",
     );
 
     if (playableCards.length > 0) {
@@ -192,40 +193,40 @@
   }
 
   function drawCardForPlayer(count = 1) {
-  const drawPile = document.querySelector(".draw-card-button");
-  const playerHand = document.getElementById("player-hand");
+    const drawPile = document.querySelector(".draw-card-button");
+    const playerHand = document.getElementById("player-hand");
 
-  for (let i = 0; i < count; i++) {
-    if (deck.length === 0) {
-      deck = shuffleDeck(discardPile.slice(0, -1));
-      discardPile = [discardPile[discardPile.length - 1]];
-    }
+    for (let i = 0; i < count; i++) {
+      if (deck.length === 0) {
+        deck = shuffleDeck(discardPile.slice(0, -1));
+        discardPile = [discardPile[discardPile.length - 1]];
+      }
 
-    const drawnCard = deck.pop();
-    if (drawnCard.animal && tooltipCache[drawnCard.animal]) {
-      drawnCard.tooltipText = tooltipCache[drawnCard.animal];
-    }
+      const drawnCard = deck.pop();
+      if (drawnCard.animal && tooltipCache[drawnCard.animal]) {
+        drawnCard.tooltipText = tooltipCache[drawnCard.animal];
+      }
 
-    animateCardToHand(drawPile, playerHand, () => {
-      playerCards = [...playerCards, drawnCard];
-      gameStore.set({
-        playerCards,
-        aiCards,
-        deck,
-        discardPile,
-        lastCard,
-        canDraw,
-        message,
-        gameOver,
-        aiResponse,
-        hoveredCard,
+      animateCardToHand(drawPile, playerHand, () => {
+        playerCards = [...playerCards, drawnCard];
+        gameStore.set({
+          playerCards,
+          aiCards,
+          deck,
+          discardPile,
+          lastCard,
+          canDraw,
+          message,
+          gameOver,
+          aiResponse,
+          hoveredCard,
+        });
       });
-    });
+    }
+    checkGameOver();
   }
-  checkGameOver();
-}
 
-  // async function generateTooltipText(card) {                  //Funktion zum generieren von Tooltips für die Karten mithilfe von OpenAI API 
+  // async function generateTooltipText(card) {                  //Funktion zum generieren von Tooltips für die Karten mithilfe von OpenAI API
   //   if (!card || !card.number) return;
   //   try {
   //     const prompt = `Gib mir 3 sehr kurze Fakten über das Tier ${card.animal}. Maximal 10 Wörter pro Fakt. Als eine unordered list.`;
@@ -240,58 +241,77 @@
   //   }
   // }
 
-let tooltipCache = {}; // Cache für Tooltips
-
-async function preloadAllTooltips() {
-  const allAnimals = new Set();
-
-  // Sammle alle einzigartigen Tiere aus dem gesamten Deck
-  for (const card of deck) {
-    if (card.animal) {
-      allAnimals.add(card.animal);
+  let tooltipCache = {}; // Cache für Tooltips
+  function loadTooltipCache() {
+    const storedCache = localStorage.getItem("tooltipCache");
+    if (storedCache) {
+      tooltipCache = JSON.parse(storedCache);
     }
   }
 
-  // Erstelle einen einzigen Prompt für alle Tiere
-  const prompt = `Gib mir für jedes der folgenden Tiere 3 sehr kurze Fakten. Maximal 10 Wörter pro Fakt. Format: Tiername - Fakt 1 - Fakt 2 - Fakt 3 # Tiername - Fakt 1 - Fakt 2 - Fakt 3 # ...\n\nTiere: ${Array.from(allAnimals).join(", ")}`;
-
-  try {
-    const response = await openai.chat.completions.create({
-      model: "gpt-4",
-      messages: [{ role: "user", content: prompt }],
-    });
-
-    // Verarbeite die Antwort und speichere die Tooltips im Cache
-    const tooltips = response.choices[0].message.content.split("#");
-    tooltips.forEach((tooltip) => {
-      const [animal, ...facts] = tooltip.split(" - ");
-      const trimmedAnimal = animal.trim();
-      tooltipCache[trimmedAnimal] = `<ul><li>${facts.join("</li><li>")}</li></ul>`;
-    });
-
-    console.log("Tooltips für alle Tiere geladen:", tooltipCache);
-  } catch (error) {
-    console.error("Fehler beim Laden der Tooltips:", error);
+  function saveTooltipCache() {
+    localStorage.setItem("tooltipCache", JSON.stringify(tooltipCache));
   }
-}
 
-// Beim Start des Spiels alle Tooltips laden
-onMount(() => {
-  dealCards();
-  preloadAllTooltips(); // Tooltips für alle Tiere laden
-  window.addEventListener("mousemove", handleMouseMove);
-});
+  async function preloadAllTooltips() {
+    loadTooltipCache(); // Lade gespeicherte Tooltips aus localStorage
 
+    const allAnimals = new Set();
 
-function getTooltipForCard(card) {
-  if (card.animal && tooltipCache[card.animal]) {
-    return tooltipCache[card.animal];
+    // Sammle alle einzigartigen Tiere aus dem gesamten Deck, die noch nicht im Cache sind
+    for (const card of deck) {
+      if (card.animal && !tooltipCache[card.animal]) {
+        allAnimals.add(card.animal);
+      }
+    }
+
+    if (allAnimals.size === 0) {
+      console.log("Alle Tooltips sind bereits im Cache.");
+      return; // Verlasse die Funktion, wenn bereits alles geladen ist
+    }
+
+    const prompt = `Gib mir für jedes der folgenden Tiere 3 sehr kurze Fakten. Maximal 10 Wörter pro Fakt. Format: Tiername - Fakt 1 - Fakt 2 - Fakt 3 # Tiername - Fakt 1 - Fakt 2 - Fakt 3 # ...\n\nTiere: ${Array.from(allAnimals).join(", ")}`;
+
+    try {
+      const response = await openai.chat.completions.create({
+        model: "gpt-4o-mini",
+        messages: [{ role: "user", content: prompt }],
+      });
+
+      const tooltips = response.choices[0].message.content.split("#");
+      tooltips.forEach((tooltip) => {
+        const [animal, ...facts] = tooltip.split(" - ");
+        const trimmedAnimal = animal.trim();
+        tooltipCache[trimmedAnimal] =
+          `<ul><li>${facts.join("</li><li>")}</li></ul>`;
+      });
+
+      saveTooltipCache(); // Speichere die geladenen Tooltips in localStorage
+      console.log(
+        "Tooltips für alle Tiere geladen und gespeichert:",
+        tooltipCache,
+      );
+    } catch (error) {
+      console.error("Fehler beim Laden der Tooltips:", error);
+    }
   }
-  return "Informationen werden geladen...";
-}
 
+  // Beim Start des Spiels alle Tooltips laden
+  onMount(() => {
+    dealCards();
+    preloadAllTooltips(); // Tooltips für alle Tiere laden
+    window.addEventListener("mousemove", handleMouseMove);
+  });
 
-  function createDeck() {                           //Funktion zum erstellen des Spielkartendeckes
+  function getTooltipForCard(card) {
+    if (card.animal && tooltipCache[card.animal]) {
+      return tooltipCache[card.animal];
+    }
+    return "Informationen werden geladen...";
+  }
+
+  function createDeck() {
+    //Funktion zum erstellen des Spielkartendeckes
     const newDeck = [];
     let id = 0;
     const animalIndex = {
@@ -307,7 +327,7 @@ function getTooltipForCard(card) {
         .sort(() => Math.random() - 0.5);
       let animalIndexCounter = 0;
 
-      for (const number of numbers) {                               
+      for (const number of numbers) {
         const animal = shuffledAnimals[animalIndexCounter];
         animalIndex[color].add(animal);
         newDeck.push({
@@ -345,7 +365,8 @@ function getTooltipForCard(card) {
     return newDeck;
   }
 
-  function shuffleDeck(deck) {                              //Funktion zum mischen des Spielkartendeckes
+  function shuffleDeck(deck) {
+    //Funktion zum mischen des Spielkartendeckes
     for (let i = deck.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [deck[i], deck[j]] = [deck[j], deck[i]];
@@ -353,7 +374,8 @@ function getTooltipForCard(card) {
     return deck;
   }
 
-  function dealCards() {                          //Funktion zum austeilen der Karten
+  function dealCards() {
+    //Funktion zum austeilen der Karten
     deck = shuffleDeck(createDeck());
     playerCards = deck.slice(0, 7);
     aiCards = deck.slice(7, 14);
@@ -376,7 +398,8 @@ function getTooltipForCard(card) {
     });
   }
 
-  function drawCard() {                                                     //Funktion zum ziehen von Karten für den Spieler
+  function drawCard() {
+    //Funktion zum ziehen von Karten für den Spieler
     const drawPile = document.querySelector(".draw-card-button");
     const playerHand = document.querySelector(".list-container");
 
@@ -440,7 +463,8 @@ function getTooltipForCard(card) {
     checkGameOver();
   }
 
-  function playCard(card) {                                 //Funktion zum spielen von Karten für den Spieler
+  function playCard(card) {
+    //Funktion zum spielen von Karten für den Spieler
     if (card.type === "Farbwahl") {
       discardPile.push(card);
       lastCard = card;
@@ -462,7 +486,7 @@ function getTooltipForCard(card) {
     }
 
     if (
-      (card.color !== lastCard.color && card.number !== lastCard.number) ||                                   //Bedingungen für das spielen von Karten
+      (card.color !== lastCard.color && card.number !== lastCard.number) || //Bedingungen für das spielen von Karten
       (lastCard.type === "Farbwahl" && card.color !== chosenColor) ||
       (card.type === "Aussetzen" &&
         lastCard.type !== "Aussetzen" &&
@@ -490,7 +514,8 @@ function getTooltipForCard(card) {
       return;
     }
 
-    if (card.type === "Tauschen") {                                               //Funktion zum tauschen von Karten für den Spieler
+    if (card.type === "Tauschen") {
+      //Funktion zum tauschen von Karten für den Spieler
       discardPile.push(card);
       lastCard = card;
       swapRandomCards();
@@ -511,7 +536,7 @@ function getTooltipForCard(card) {
       return;
     }
 
-    animateCardToDiscard(card, () => {                                                
+    animateCardToDiscard(card, () => {
       playerCards = playerCards.filter((c) => c !== card);
       discardPile.push(card);
       lastCard = card;
@@ -557,7 +582,8 @@ function getTooltipForCard(card) {
     });
   }
 
-  function handleColorChoice(color) {                             //Funktion zum auswählen einer Farbe für die Karte "Farbwahl"
+  function handleColorChoice(color) {
+    //Funktion zum auswählen einer Farbe für die Karte "Farbwahl"
     chosenColor = color;
     lastCard.color = chosenColor;
     colorChoiceMenuOpen = false;
@@ -576,9 +602,10 @@ function getTooltipForCard(card) {
     scheduleAITurn();
   }
 
-  function swapRandomCards() {                                            //Funktion zum tauschen von Karten
+  function swapRandomCards() {
+    //Funktion zum tauschen von Karten
     const randomPlayerCardIndex = Math.floor(
-      Math.random() * playerCards.length
+      Math.random() * playerCards.length,
     );
     const randomAiCardIndex = Math.floor(Math.random() * aiCards.length);
 
@@ -588,7 +615,7 @@ function getTooltipForCard(card) {
 
     if (aiCards[randomAiCardIndex].type === "Tauschen") {
       const newRandomAiCardIndex = aiCards.findIndex(
-        (card) => card.type !== "Tauschen"
+        (card) => card.type !== "Tauschen",
       );
       if (newRandomAiCardIndex !== -1) {
         aiCards[randomAiCardIndex] = aiCards[newRandomAiCardIndex];
@@ -609,7 +636,8 @@ function getTooltipForCard(card) {
     });
   }
 
-  function checkGameOver() {                                              //Funktion zum überprüfen ob das Spiel vorbei ist
+  function checkGameOver() {
+    //Funktion zum überprüfen ob das Spiel vorbei ist
     if (playerCards.length === 0) {
       message = "Du hast gewonnen!";
       gameOver = true;
@@ -643,12 +671,14 @@ function getTooltipForCard(card) {
     }
   }
 
-  function restartGame() {                                      //Funktion zum neustarten des Spiels
+  function restartGame() {
+    //Funktion zum neustarten des Spiels
     dealCards();
   }
 
-  function removeCard(card) {                                                       //Funktion zum entfernen von Karten
-    playerCards = playerCards.filter((c) => c !== card);  
+  function removeCard(card) {
+    //Funktion zum entfernen von Karten
+    playerCards = playerCards.filter((c) => c !== card);
     discardPile.push(card);
     lastCard = card;
     canDraw = true;
@@ -668,7 +698,8 @@ function getTooltipForCard(card) {
     checkGameOver();
   }
 
-  function getBackgroundImage(animal) {                                                 //Funktion zum laden der Bilder
+  function getBackgroundImage(animal) {
+    //Funktion zum laden der Bilder
     const imageUrl = animalImages[animal] || "default_image.jpg";
     console.log(`Background image for ${animal}: ${imageUrl}`);
     return imageUrl;
@@ -697,11 +728,12 @@ function getTooltipForCard(card) {
 
   onMount(() => {
     dealCards();
-    preloadTooltips();
+    preloadAllTooltips();
     window.addEventListener("mousemove", handleMouseMove);
   });
 
-  function animateCardToDiscard(card, callback) {                                           //Funktion zum animieren der Karten auf den Stapel -> folgend für die anderen Zustände 
+  function animateCardToDiscard(card, callback) {
+    //Funktion zum animieren der Karten auf den Stapel -> folgend für die anderen Zustände
     const cardEl = document.querySelector(`button[data-card-id="${card.id}"]`);
     if (!cardEl) {
       if (callback) callback();
@@ -783,7 +815,8 @@ function getTooltipForCard(card) {
     });
   }
 
-  function drawCardForAI(count = 1) {                                         //Funktion zum ziehen von Karten für die AI
+  function drawCardForAI(count = 1) {
+    //Funktion zum ziehen von Karten für die AI
     const drawPile = document.querySelector(".draw-card-button");
     const aiHand = document.getElementById("ai-hand");
     for (let i = 0; i < count; i++) {
@@ -835,7 +868,8 @@ function getTooltipForCard(card) {
 </header>
 <main>
   <div>
-    <ul id="ai-hand" class="list-container">        <!-- KI Karten + Karten kleiner gemacht-->
+    <ul id="ai-hand" class="list-container">
+      <!-- KI Karten + Karten kleiner gemacht-->
       {#each aiCards as card}
         <button
           class={`card ${card.type ? "special " + card.type.toLowerCase().replace(" ", "-") : ""} ${getHabitatClass(card.habitat)}`}
@@ -859,7 +893,7 @@ function getTooltipForCard(card) {
           <li
             class={`card ${lastCard.type ? "special " + lastCard.type.toLowerCase().replace(" ", "-") : ""} ${getHabitatClass(lastCard.habitat)}`}
             style="background-color: {lastCard.color}; background-image: url('{getBackgroundImage(
-              lastCard.animal
+              lastCard.animal,
             )}'); position: relative;"
             on:mouseover={() => (hoveredCard = lastCard)}
             on:mouseout={() => (hoveredCard = null)}
@@ -954,12 +988,13 @@ function getTooltipForCard(card) {
   </div>
 
   <div>
-    <ul id="player-hand" class="list-container">                                    <!-- Spieler Karten auf der Hand-->
+    <ul id="player-hand" class="list-container">
+      <!-- Spieler Karten auf der Hand-->
       {#each playerCards as card, index}
         <button
           class={`card ${card.type ? "special " + card.type.toLowerCase().replace(" ", "-") : ""} ${getHabitatClass(card.habitat)}`}
           style="background-color: {card.color}; background-image: url('{getBackgroundImage(
-            card.animal
+            card.animal,
           )}');position: relative; padding: 5px;"
           data-card-id={card.id}
           on:mouseover={() => (hoveredCard = card)}
@@ -1080,23 +1115,26 @@ function getTooltipForCard(card) {
   {/if}
 
   {#if hoveredCard && !hoveredCard.type}
-  <div class="tooltip" role="tooltip">
-    <img
-      src={getBackgroundImageColored(hoveredCard.animal)}
-      alt={hoveredCard.animal}
-      style="
+    <div class="tooltip" role="tooltip">
+      <img
+        src={getBackgroundImageColored(hoveredCard.animal)}
+        alt={hoveredCard.animal}
+        style="
         height: 80%; 
         object-fit: cover; 
-        border-radius: 4px;"/>
-    <div>
-      <h2>{hoveredCard.animal}</h2>
-      <p style="color: {myColors[hoveredCard.color]};">{hoveredCard.habitat}</p>
-      <p>
-        {@html getTooltipForCard(hoveredCard)}
-      </p>
+        border-radius: 4px;"
+      />
+      <div>
+        <h2>{hoveredCard.animal}</h2>
+        <p style="color: {myColors[hoveredCard.color]};">
+          {hoveredCard.habitat}
+        </p>
+        <p>
+          {@html getTooltipForCard(hoveredCard)}
+        </p>
+      </div>
     </div>
-  </div>
-{/if}
+  {/if}
 
   <!-- {#if hoveredCard && !hoveredCard.type}
   <div
@@ -1120,7 +1158,6 @@ function getTooltipForCard(card) {
     </div>
   </div>
 {/if} -->
-
 </main>
 
 <style>
@@ -1140,5 +1177,4 @@ function getTooltipForCard(card) {
     transition: all 0.5s ease-in-out;
     pointer-events: none;
   }
-  
 </style>
