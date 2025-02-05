@@ -122,7 +122,7 @@
     }
   }
 
-  function aiPlayTurn() {
+  function aiPlayTurn() {                                     //KI Spielzug, was kann sie legen, wann kann sie legen, wann kann sie ziehen
     const playableCards = aiCards.filter(
       (card) =>
         (card.color === lastCard.color && card.type !== "Farbwahl") ||
@@ -191,7 +191,7 @@
     checkGameOver();
   }
 
-  function drawCardForPlayer(count = 1) {
+  function drawCardForPlayer(count = 1) {                             //Funktion zum ziehen von Karten für den Spieler 
     const drawPile = document.querySelector(".draw-card-button");
 
     const playerHand = document.getElementById("player-hand");
@@ -222,7 +222,7 @@
     checkGameOver();
   }
 
-  async function generateTooltipText(card) {
+  async function generateTooltipText(card) {                  //Funktion zum generieren von Tooltips für die Karten mithilfe von OpenAI API 
     if (!card || !card.number) return;
     try {
       const prompt = `Gib mir 3 sehr kurze Fakten über das Tier ${card.animal}. Maximal 10 Wörter pro Fakt. Als eine unordered list.`;
@@ -237,7 +237,7 @@
     }
   }
 
-  async function preloadTooltips() {
+  async function preloadTooltips() {                      //Funktion zum vorbereiten von Tooltips für die Karten mithilfe von OpenAI API
     const cardsToPreload = [];
 
     for (const card of playerCards) {
@@ -253,7 +253,7 @@
     await Promise.all(cardsToPreload);
   }
 
-  function createDeck() {
+  function createDeck() {                           //Funktion zum erstellen des Spielkartendeckes
     const newDeck = [];
     let id = 0;
     const animalIndex = {
@@ -269,7 +269,7 @@
         .sort(() => Math.random() - 0.5);
       let animalIndexCounter = 0;
 
-      for (const number of numbers) {
+      for (const number of numbers) {                               
         const animal = shuffledAnimals[animalIndexCounter];
         animalIndex[color].add(animal);
         newDeck.push({
@@ -307,7 +307,7 @@
     return newDeck;
   }
 
-  function shuffleDeck(deck) {
+  function shuffleDeck(deck) {                              //Funktion zum mischen des Spielkartendeckes
     for (let i = deck.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [deck[i], deck[j]] = [deck[j], deck[i]];
@@ -315,7 +315,7 @@
     return deck;
   }
 
-  function dealCards() {
+  function dealCards() {                          //Funktion zum austeilen der Karten
     deck = shuffleDeck(createDeck());
     playerCards = deck.slice(0, 7);
     aiCards = deck.slice(7, 14);
@@ -338,7 +338,7 @@
     });
   }
 
-  function drawCard() {
+  function drawCard() {                                                     //Funktion zum ziehen von Karten für den Spieler
     const drawPile = document.querySelector(".draw-card-button");
     const playerHand = document.querySelector(".list-container");
 
@@ -402,7 +402,7 @@
     checkGameOver();
   }
 
-  function playCard(card) {
+  function playCard(card) {                                 //Funktion zum spielen von Karten für den Spieler
     if (card.type === "Farbwahl") {
       discardPile.push(card);
       lastCard = card;
@@ -424,7 +424,7 @@
     }
 
     if (
-      (card.color !== lastCard.color && card.number !== lastCard.number) ||
+      (card.color !== lastCard.color && card.number !== lastCard.number) ||                                   //Bedingungen für das spielen von Karten
       (lastCard.type === "Farbwahl" && card.color !== chosenColor) ||
       (card.type === "Aussetzen" &&
         lastCard.type !== "Aussetzen" &&
@@ -452,7 +452,7 @@
       return;
     }
 
-    if (card.type === "Tauschen") {
+    if (card.type === "Tauschen") {                                               //Funktion zum tauschen von Karten für den Spieler
       discardPile.push(card);
       lastCard = card;
       swapRandomCards();
@@ -473,7 +473,7 @@
       return;
     }
 
-    animateCardToDiscard(card, () => {
+    animateCardToDiscard(card, () => {                                                
       playerCards = playerCards.filter((c) => c !== card);
       discardPile.push(card);
       lastCard = card;
@@ -519,7 +519,7 @@
     });
   }
 
-  function handleColorChoice(color) {
+  function handleColorChoice(color) {                             //Funktion zum auswählen einer Farbe für die Karte "Farbwahl"
     chosenColor = color;
     lastCard.color = chosenColor;
     colorChoiceMenuOpen = false;
@@ -538,7 +538,7 @@
     scheduleAITurn();
   }
 
-  function swapRandomCards() {
+  function swapRandomCards() {                                            //Funktion zum tauschen von Karten
     const randomPlayerCardIndex = Math.floor(
       Math.random() * playerCards.length
     );
@@ -571,7 +571,7 @@
     });
   }
 
-  function checkGameOver() {
+  function checkGameOver() {                                              //Funktion zum überprüfen ob das Spiel vorbei ist
     if (playerCards.length === 0) {
       message = "Du hast gewonnen!";
       gameOver = true;
@@ -605,12 +605,12 @@
     }
   }
 
-  function restartGame() {
+  function restartGame() {                                      //Funktion zum neustarten des Spiels
     dealCards();
   }
 
-  function removeCard(card) {
-    playerCards = playerCards.filter((c) => c !== card);
+  function removeCard(card) {                                                       //Funktion zum entfernen von Karten
+    playerCards = playerCards.filter((c) => c !== card);  
     discardPile.push(card);
     lastCard = card;
     canDraw = true;
@@ -630,7 +630,7 @@
     checkGameOver();
   }
 
-  function getBackgroundImage(animal) {
+  function getBackgroundImage(animal) {                                                 //Funktion zum laden der Bilder
     const imageUrl = animalImages[animal] || "default_image.jpg";
     console.log(`Background image for ${animal}: ${imageUrl}`);
     return imageUrl;
@@ -663,7 +663,7 @@
     window.addEventListener("mousemove", handleMouseMove);
   });
 
-  function animateCardToDiscard(card, callback) {
+  function animateCardToDiscard(card, callback) {                                           //Funktion zum animieren der Karten auf den Stapel -> folgend für die anderen Zustände 
     const cardEl = document.querySelector(`button[data-card-id="${card.id}"]`);
     if (!cardEl) {
       if (callback) callback();
@@ -745,7 +745,7 @@
     });
   }
 
-  function drawCardForAI(count = 1) {
+  function drawCardForAI(count = 1) {                                         //Funktion zum ziehen von Karten für die AI
     const drawPile = document.querySelector(".draw-card-button");
     const aiHand = document.getElementById("ai-hand");
     for (let i = 0; i < count; i++) {
@@ -916,7 +916,7 @@
   </div>
 
   <div>
-    <ul id="player-hand" class="list-container">
+    <ul id="player-hand" class="list-container">                                    <!-- Spieler Karten auf der Hand-->
       {#each playerCards as card, index}
         <button
           class={`card ${card.type ? "special " + card.type.toLowerCase().replace(" ", "-") : ""} ${getHabitatClass(card.habitat)}`}
