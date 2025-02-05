@@ -182,6 +182,26 @@
           hoveredCard,
         });
       });
+      if (aiCards.length - 1 === 0) {
+        message = "Die KI hat gewonnen!";
+        gameOver = true;
+        gameStore.set({
+          playerCards,
+          aiCards,
+          deck,
+          discardPile,
+          lastCard,
+          canDraw,
+          message,
+          gameOver,
+          aiResponse,
+          hoveredCard,
+        });
+
+        setTimeout(() => {
+          restartGame();
+        }, 3000);
+      }
     } else {
       drawCardForAI(1);
 
@@ -638,7 +658,6 @@
   }
 
   function checkGameOver() {
-    //Funktion zum überprüfen ob das Spiel vorbei ist
     if (playerCards.length === 0) {
       message = "Du hast gewonnen!";
       gameOver = true;
@@ -669,7 +688,10 @@
         aiResponse,
         hoveredCard,
       });
-      
+
+      setTimeout(() => {
+        restartGame();
+      }, 1000);
     }
   }
 
