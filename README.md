@@ -19,7 +19,7 @@ Jeder Spieler erhält zu Beginn 7 Karten. Beim Ablegen muss die Karte entweder d
 
 ### Animationslogik
 
-- Die Kartenbewegungen sind durch eigene Animationen umgesetzt.
+- Die Kartenbewegungen sind für beide Spieler durch eigene Animationen umgesetzt.
 
 ### Verzeichnisstruktur
 

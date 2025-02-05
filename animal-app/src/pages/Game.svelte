@@ -774,7 +774,7 @@
 </script>
 
 <header>
-  <div class="content-container">
+  <!-- <div class="content-container">
     <img src="/images/logo-colored.png" alt="Colored Logo" />
   </div>
   <h1>PAW</h1>
@@ -783,20 +783,26 @@
     <a href="#/explanation" style="text-decoration: underline;"
       >Finde es hier raus!</a
     >
-  </p>
-  <nav>
-    <a href="#/">Home</a>
-    <!-- <a href="#/game">Spiel</a>
-    <a href="#/explanation">Erklärung</a> -->
+  </p> -->
+  <nav class="top-nav">
+    <div class="logo">
+      <!-- Hier Ihr Logo einfügen -->
+      <img src="/images/logo-colored.png" alt="Logo" />
+    </div>
+    <div class="nav-links">
+      <a href="/">Home</a>
+      <a href="#/explanation">Spielerklärung</a>
+    </div>
   </nav>
 </header>
 <main>
   <div>
-    <ul id="ai-hand" class="list-container">
+    <ul id="ai-hand" class="list-container">        <!-- KI Karten + Karten kleiner gemacht-->
       {#each aiCards as card}
         <button
           class={`card ${card.type ? "special " + card.type.toLowerCase().replace(" ", "-") : ""} ${getHabitatClass(card.habitat)}`}
-          style="background-image: url('images/ruckseite.png');border: none;pointer-events: none;"
+          style="background-image: url('images/ruckseite.png');border: none;pointer-events: none;width: calc(100vh * 0.10);
+  height: calc(100vh * 0.15);"
           data-card-id={card.id}
         >
         </button>
@@ -804,9 +810,9 @@
     </ul>
   </div>
 
-  <div>
+  <!-- <div>
     <button on:click={aiPlayTurn} disabled={gameOver}>KI Spielzug</button>
-  </div>
+  </div> -->
 
   <div class="discard-draw-container">
     <div>
@@ -1026,8 +1032,8 @@
   {/if}
 
   <div>
-    <h2>Nachricht:</h2>
-    <p>{message}</p>
+    <!-- <h2>Nachricht:</h2> -->
+    <p style="position: fixed; left: 50vw;margin-left: -20px;">{message}</p>
   </div>
   {#if gameOver}
     <div>
@@ -1036,16 +1042,17 @@
   {/if}
 
   {#if hoveredCard && !hoveredCard.type}
-    <div
-      class="tooltip"
-      role="tooltip"
-      style="position: fixed; left: 20%; top: 500px;"
-    >
-      <img
-        src={getBackgroundImageColored(hoveredCard.animal)}
-        alt={hoveredCard.animal}
-        style="width: 100%; display: block; margin-bottom: 10px; object-fit: fill; border-radius: 5px;"
-      />
+  <div
+    class="tooltip"
+    role="tooltip">
+    <img
+      src={getBackgroundImageColored(hoveredCard.animal)}
+      alt={hoveredCard.animal}
+      style="
+        height: 80%; 
+        object-fit: cover; 
+        border-radius: 4px;"/>
+    <div>
       <h2>{hoveredCard.animal}</h2>
       <p>{hoveredCard.habitat}</p>
       <p>
@@ -1054,7 +1061,9 @@
           : "Loading..."}
       </p>
     </div>
-  {/if}
+  </div>
+{/if}
+
 </main>
 
 <style>
@@ -1074,4 +1083,5 @@
     transition: all 0.5s ease-in-out;
     pointer-events: none;
   }
+  
 </style>
