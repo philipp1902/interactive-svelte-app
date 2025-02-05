@@ -237,21 +237,63 @@
     }
   }
 
-  async function preloadTooltips() {                      //Funktion zum vorbereiten von Tooltips für die Karten mithilfe von OpenAI API
-    const cardsToPreload = [];
+  async function preloadTooltips() {                                                              
+  const cardsToPreload = [];
 
-    for (const card of playerCards) {
-      if (card.animal && !card.tooltipText) {
-        cardsToPreload.push(generateTooltipText(card));
-      }
+  const animalsToPreload = [];
+  for (const card of playerCards) {
+    if (card.animal && !card.tooltipText) {
+      animalsToPreload.push(card.animal);
     }
-
-    if (lastCard && lastCard.animal && !lastCard.tooltipText) {
-      cardsToPreload.push(generateTooltipText(lastCard));
-    }
-
-    await Promise.all(cardsToPreload);
   }
+
+  if (lastCard && lastCard.animal && !lastCard.tooltipText) {
+    animalsToPreload.push(lastCard.animal);
+  }
+
+  if (animalsToPreload.length === 0) return;
+
+  // Erstelle einen einzigen Prompt für alle Tiere
+  const prompt = `Gib mir für jedes der folgenden Tiere 3 sehr kurze Fakten. Maximal 10 Wörter pro Fakt. Format: Tiername - Fakt 1 - Fakt 2 - Fakt 3 # Tiername - Fakt 1 - Fakt 2 - Fakt 3 # ...\n\nTiere: ${animalsToPreload.join(", ")}`;
+
+  try {
+    const response = await openai.chat.completions.create({
+      model: "gpt-4",
+      messages: [{ role: "user", content: prompt }],
+    });
+
+    const tooltips = response.choices[0].message.content.split("#");
+
+    // Ordne die Tooltips den entsprechenden Karten zu
+    tooltips.forEach((tooltip) => {
+      const [animal, ...facts] = tooltip.split(" - ");
+      const trimmedAnimal = animal.trim();
+
+      // Finde die Karte mit dem entsprechenden Tier
+      const card = playerCards.find((card) => card.animal === trimmedAnimal) || (lastCard && lastCard.animal === trimmedAnimal ? lastCard : null);
+
+      if (card) {
+        card.tooltipText = `<ul><li>${facts.join("</li><li>")}</li></ul>`;
+      }
+    });
+
+    // Aktualisiere den Store, um die neuen Tooltips zu speichern
+    gameStore.set({
+      playerCards,
+      aiCards,
+      deck,
+      discardPile,
+      lastCard,
+      canDraw,
+      message,
+      gameOver,
+      aiResponse,
+      hoveredCard,
+    });
+  } catch (error) {
+    console.error("Error generating tooltip text:", error);
+  }
+}
 
   function createDeck() {                           //Funktion zum erstellen des Spielkartendeckes
     const newDeck = [];
@@ -1054,11 +1096,11 @@
         border-radius: 4px;"/>
     <div>
       <h2>{hoveredCard.animal}</h2>
-      <p>{hoveredCard.habitat}</p>
+      <p style="color: {myColors[hoveredCard.color]};">{hoveredCard.habitat}</p>
       <p>
         {@html hoveredCard.tooltipText
           ? hoveredCard.tooltipText.replace(/-/g, "<br>-")
-          : "Loading..."}
+          : "Informationen werden geladen..."}
       </p>
     </div>
   </div>
