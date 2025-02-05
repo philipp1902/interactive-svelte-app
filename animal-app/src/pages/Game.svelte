@@ -3,8 +3,8 @@
   import DrawCardButton from "../components/DrawCardButton.svelte";
   import { gameStore } from "../store";
   import OpenAI from "openai";
-  import DrawTwoCard from "../components/DrawTwoCard.svelte";
-  import SkipCard from "../components/SkipCard.svelte";
+  // import DrawTwoCard from "../components/DrawTwoCard.svelte";
+  // import SkipCard from "../components/SkipCard.svelte";
   import ColorChoiceCard from "../components/ColorChoiceCard.svelte";
   import { animalImages } from "../animalImages.js";
   import { animalImagesColored } from "../animalImagescolored.js";
@@ -189,6 +189,7 @@
         aiPlayTurn();
       }, 600);*/
     }
+    canDraw = true;
     checkGameOver();
   }
 
@@ -668,6 +669,7 @@
         aiResponse,
         hoveredCard,
       });
+      
     }
   }
 
@@ -863,6 +865,7 @@
     <div class="nav-links">
       <a href="/">Home</a>
       <a href="#/explanation">Spielerklärung</a>
+      <button on:click={restartGame}>Spiel neustarten</button>
     </div>
   </nav>
 </header>
@@ -1110,8 +1113,8 @@
   </div>
   {#if gameOver}
     <div>
-      <button on:click={restartGame}>Neues Spiel starten</button>
-    </div>
+        <button on:click={restartGame}>Spiel neustarten</button>
+      </div>
   {/if}
 
   {#if hoveredCard && !hoveredCard.type}
