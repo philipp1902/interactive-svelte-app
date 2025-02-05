@@ -191,70 +191,69 @@
     checkGameOver();
   }
 
-  function drawCardForPlayer(count = 1) {                             //Funktion zum ziehen von Karten für den Spieler 
-    const drawPile = document.querySelector(".draw-card-button");
+  function drawCardForPlayer(count = 1) {
+  const drawPile = document.querySelector(".draw-card-button");
+  const playerHand = document.getElementById("player-hand");
 
-    const playerHand = document.getElementById("player-hand");
+  for (let i = 0; i < count; i++) {
+    if (deck.length === 0) {
+      deck = shuffleDeck(discardPile.slice(0, -1));
+      discardPile = [discardPile[discardPile.length - 1]];
+    }
 
-    for (let i = 0; i < count; i++) {
-      if (deck.length === 0) {
-        deck = shuffleDeck(discardPile.slice(0, -1));
-        discardPile = [discardPile[discardPile.length - 1]];
-      }
+    const drawnCard = deck.pop();
+    if (drawnCard.animal && tooltipCache[drawnCard.animal]) {
+      drawnCard.tooltipText = tooltipCache[drawnCard.animal];
+    }
 
-      const drawnCard = deck.pop();
-      animateCardToHand(drawPile, playerHand, () => {
-        playerCards = [...playerCards, drawnCard];
-        gameStore.set({
-          playerCards,
-          aiCards,
-          deck,
-          discardPile,
-          lastCard,
-          canDraw,
-          message,
-          gameOver,
-          aiResponse,
-          hoveredCard,
-        });
+    animateCardToHand(drawPile, playerHand, () => {
+      playerCards = [...playerCards, drawnCard];
+      gameStore.set({
+        playerCards,
+        aiCards,
+        deck,
+        discardPile,
+        lastCard,
+        canDraw,
+        message,
+        gameOver,
+        aiResponse,
+        hoveredCard,
       });
+    });
+  }
+  checkGameOver();
+}
+
+  // async function generateTooltipText(card) {                  //Funktion zum generieren von Tooltips für die Karten mithilfe von OpenAI API 
+  //   if (!card || !card.number) return;
+  //   try {
+  //     const prompt = `Gib mir 3 sehr kurze Fakten über das Tier ${card.animal}. Maximal 10 Wörter pro Fakt. Als eine unordered list.`;
+  //     const response = await openai.chat.completions.create({
+  //       model: "gpt-4",
+  //       messages: [{ role: "user", content: prompt }],
+  //     });
+  //     card.tooltipText = response.choices[0].message.content;
+  //   } catch (error) {
+  //     console.error("Error generating tooltip text:", error);
+  //     card.tooltipText = "Error generating tooltip text.";
+  //   }
+  // }
+
+let tooltipCache = {}; // Cache für Tooltips
+
+async function preloadAllTooltips() {
+  const allAnimals = new Set();
+
+  // Sammle alle einzigartigen Tiere aus dem gesamten Deck
+  for (const card of deck) {
+    if (card.animal) {
+      allAnimals.add(card.animal);
     }
-    checkGameOver();
   }
-
-  async function generateTooltipText(card) {                  //Funktion zum generieren von Tooltips für die Karten mithilfe von OpenAI API 
-    if (!card || !card.number) return;
-    try {
-      const prompt = `Gib mir 3 sehr kurze Fakten über das Tier ${card.animal}. Maximal 10 Wörter pro Fakt. Als eine unordered list.`;
-      const response = await openai.chat.completions.create({
-        model: "gpt-4",
-        messages: [{ role: "user", content: prompt }],
-      });
-      card.tooltipText = response.choices[0].message.content;
-    } catch (error) {
-      console.error("Error generating tooltip text:", error);
-      card.tooltipText = "Error generating tooltip text.";
-    }
-  }
-
-  async function preloadTooltips() {                                                              
-  const cardsToPreload = [];
-
-  const animalsToPreload = [];
-  for (const card of playerCards) {
-    if (card.animal && !card.tooltipText) {
-      animalsToPreload.push(card.animal);
-    }
-  }
-
-  if (lastCard && lastCard.animal && !lastCard.tooltipText) {
-    animalsToPreload.push(lastCard.animal);
-  }
-
-  if (animalsToPreload.length === 0) return;
 
   // Erstelle einen einzigen Prompt für alle Tiere
-  const prompt = `Gib mir für jedes der folgenden Tiere 3 sehr kurze Fakten. Maximal 10 Wörter pro Fakt. Format: Tiername - Fakt 1 - Fakt 2 - Fakt 3 # Tiername - Fakt 1 - Fakt 2 - Fakt 3 # ...\n\nTiere: ${animalsToPreload.join(", ")}`;
+  const prompt = `Gib mir für jedes der folgenden Tiere 3 sehr kurze Fakten. Maximal 10 Wörter pro Fakt. Format: Tiername - Fakt 1 - Fakt 2 - Fakt 3 # Tiername - Fakt 1 - Fakt 2 - Fakt 3 # ...\n\nTiere: ${Array.from(allAnimals).join(", ")}`;
 
   try {
     const response = await openai.chat.completions.create({
@@ -262,38 +261,35 @@
       messages: [{ role: "user", content: prompt }],
     });
 
+    // Verarbeite die Antwort und speichere die Tooltips im Cache
     const tooltips = response.choices[0].message.content.split("#");
-
-    // Ordne die Tooltips den entsprechenden Karten zu
     tooltips.forEach((tooltip) => {
       const [animal, ...facts] = tooltip.split(" - ");
       const trimmedAnimal = animal.trim();
-
-      // Finde die Karte mit dem entsprechenden Tier
-      const card = playerCards.find((card) => card.animal === trimmedAnimal) || (lastCard && lastCard.animal === trimmedAnimal ? lastCard : null);
-
-      if (card) {
-        card.tooltipText = `<ul><li>${facts.join("</li><li>")}</li></ul>`;
-      }
+      tooltipCache[trimmedAnimal] = `<ul><li>${facts.join("</li><li>")}</li></ul>`;
     });
 
-    // Aktualisiere den Store, um die neuen Tooltips zu speichern
-    gameStore.set({
-      playerCards,
-      aiCards,
-      deck,
-      discardPile,
-      lastCard,
-      canDraw,
-      message,
-      gameOver,
-      aiResponse,
-      hoveredCard,
-    });
+    console.log("Tooltips für alle Tiere geladen:", tooltipCache);
   } catch (error) {
-    console.error("Error generating tooltip text:", error);
+    console.error("Fehler beim Laden der Tooltips:", error);
   }
 }
+
+// Beim Start des Spiels alle Tooltips laden
+onMount(() => {
+  dealCards();
+  preloadAllTooltips(); // Tooltips für alle Tiere laden
+  window.addEventListener("mousemove", handleMouseMove);
+});
+
+
+function getTooltipForCard(card) {
+  if (card.animal && tooltipCache[card.animal]) {
+    return tooltipCache[card.animal];
+  }
+  return "Informationen werden geladen...";
+}
+
 
   function createDeck() {                           //Funktion zum erstellen des Spielkartendeckes
     const newDeck = [];
@@ -1084,6 +1080,25 @@
   {/if}
 
   {#if hoveredCard && !hoveredCard.type}
+  <div class="tooltip" role="tooltip">
+    <img
+      src={getBackgroundImageColored(hoveredCard.animal)}
+      alt={hoveredCard.animal}
+      style="
+        height: 80%; 
+        object-fit: cover; 
+        border-radius: 4px;"/>
+    <div>
+      <h2>{hoveredCard.animal}</h2>
+      <p style="color: {myColors[hoveredCard.color]};">{hoveredCard.habitat}</p>
+      <p>
+        {@html getTooltipForCard(hoveredCard)}
+      </p>
+    </div>
+  </div>
+{/if}
+
+  <!-- {#if hoveredCard && !hoveredCard.type}
   <div
     class="tooltip"
     role="tooltip">
@@ -1104,7 +1119,7 @@
       </p>
     </div>
   </div>
-{/if}
+{/if} -->
 
 </main>
 
