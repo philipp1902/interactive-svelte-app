@@ -83,7 +83,7 @@ Das Spiel unterscheidet zwischen Spieler und KI. Es wird geprüft, ob eine Karte
 ## Installation 🛠️
 ```plaintext
 # Repository klonen
-git clone [https://github.com/charaschoe/embleem.git](https://github.com/philipp1902/interactive-svelte-app.git)
+git clone https://github.com/philipp1902/interactive-svelte-app.git
 cd embleem
 
 # Abhängigkeiten installieren
