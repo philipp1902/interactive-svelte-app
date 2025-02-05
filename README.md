@@ -84,7 +84,7 @@ Das Spiel unterscheidet zwischen Spieler und KI. Es wird geprüft, ob eine Karte
 ```plaintext
 # Repository klonen
 git clone https://github.com/philipp1902/interactive-svelte-app.git
-cd embleem
+cd animal-app
 
 # Abhängigkeiten installieren
 npm install
