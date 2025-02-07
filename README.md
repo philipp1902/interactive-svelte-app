@@ -97,7 +97,7 @@ npm run dev
 
 .env-Datei ändern
 ```plaintext
-VITE_UNSPLASH_ACCESS_KEY=eigener_api_key
+VITE_OPENAI_API_KEY=eigener_api_key
 ```
 
 ## Quellen 🔗
